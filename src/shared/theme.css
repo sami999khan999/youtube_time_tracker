@@ -1,0 +1,127 @@
+/* === Theme Variables === */
+:root {
+    --stats-primary: #e11d48;
+    --stats-bg: #ffffff;
+    --stats-sidebar-bg: #ffffff;
+    --stats-text-primary: #0f0f0f;
+    --stats-text-secondary: #606060;
+    --stats-card-bg: #ffffff;
+    --stats-card-accent-bg: rgba(225, 29, 72, 0.05); /* Adjusted to match e11d48 */
+    --stats-border: rgba(0, 0, 0, 0.1);
+    --stats-glass-bg: rgba(255, 255, 255, 0.7);
+    --stats-glass-border: rgba(0, 0, 0, 0.1);
+    --stats-glass-text: #0f0f0f;
+    --stats-shadow: transparent;
+    --stats-card-shadow: none;
+    --stats-input-bg: #f9f9f9;
+    --stats-input-border: #d3d3d3;
+    --stats-toggle-bg: #cccccc;
+    --stats-btn-bg: #eeeeee;
+    --stats-btn-hover: #e0e0e0;
+    --stats-chart-label: #606060;
+    --stats-delete-btn-bg: rgba(0, 0, 0, 0.06);
+    --stats-delete-btn-hover: rgba(0, 0, 0, 0.12);
+    --stats-progress-track: rgba(0, 0, 0, 0.12);
+    --stats-thumb-bg: #e0e0e0;
+    --stats-pie-center: #ffffff;
+    --stats-body-bg: #ffffff;
+    --stats-chart-bar-bg: rgba(0, 0, 0, 0.04);
+    --stats-modal-overlay: rgba(255, 255, 255, 0.8);
+    --stats-modal-title-gradient: linear-gradient(135deg, #0f0f0f 0%, #606060 100%);
+    --stats-quote-bg: rgba(0, 0, 0, 0.03);
+}
+
+html[dark], [dark] {
+    --stats-primary: #e11d48;
+    --stats-bg: #0f0f0f;
+    --stats-sidebar-bg: rgba(15, 15, 15, 0.95);
+    --stats-text-primary: #ffffff;
+    --stats-text-secondary: #aaaaaa;
+    --stats-card-bg: #0f0f0f;
+    --stats-card-accent-bg: linear-gradient(135deg, rgba(225, 29, 72, 0.1), rgba(225, 29, 72, 0.05));
+    --stats-border: rgba(255, 255, 255, 0.1);
+    --stats-glass-bg: rgba(28, 28, 28, 0.4);
+    --stats-glass-border: rgba(255, 255, 255, 0.1);
+    --stats-glass-text: #ffffff;
+    --stats-shadow: rgba(0, 0, 0, 0.5);
+    --stats-card-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
+    --stats-input-bg: #1a1a1a;
+    --stats-input-border: rgba(255, 255, 255, 0.1);
+    --stats-toggle-bg: #3f3f3f;
+    --stats-btn-bg: #2a2a2a;
+    --stats-btn-hover: #3f3f3f;
+    --stats-chart-label: #aaaaaa;
+    --stats-delete-btn-bg: rgba(255, 255, 255, 0.1);
+    --stats-delete-btn-hover: rgba(255, 255, 255, 0.2);
+    --stats-progress-track: rgba(255, 255, 255, 0.15);
+    --stats-thumb-bg: #1e1e1e;
+    --stats-pie-center: #0f0f0f;
+    --stats-body-bg: linear-gradient(to bottom, #0f0f0f, #050505);
+    --stats-chart-bar-bg: rgba(255, 255, 255, 0.05);
+    --stats-modal-overlay: rgba(0, 0, 0, 0.7);
+    --stats-modal-title-gradient: linear-gradient(135deg, #fff 0%, #aaa 100%);
+    --stats-quote-bg: rgba(255, 255, 255, 0.03);
+}
+
+/* === Global YouTube Scrollbar === */
+::-webkit-scrollbar {
+    width: 1px !important;
+    height: 1px !important;
+}
+
+body.stats-sidebar-active::-webkit-scrollbar {
+    width: 0 !important;
+    height: 0 !important;
+    display: none !important;
+}
+
+::-webkit-scrollbar-track {
+    background: transparent !important;
+}
+
+::-webkit-scrollbar-thumb {
+    background: var(--stats-primary) !important;
+    border-radius: 0 !important;
+}
+
+/* === Dislike Count Reboot Styles === */
+#ytt-dislike-reboot {
+    font-family: "Roboto", "Arial", sans-serif;
+    user-select: none;
+    white-space: nowrap;
+}
+
+/* Ensure parents don't clip our sibling */
+ytd-watch-metadata #actions,
+ytd-watch-metadata #actions-inner,
+ytd-watch-metadata #menu,
+ytd-segmented-like-dislike-button-renderer {
+    overflow: visible !important;
+}
+
+/* Adjustments for Shorts */
+ytd-reel-video-renderer .ytt-dislike-count-container {
+    height: auto;
+    padding: 0;
+    margin-top: 4px;
+}
+
+ytd-reel-video-renderer #ytt-dislike-count {
+    font-size: 12px;
+    line-height: 1;
+}
+
+/* Fix: Prevent extension styles from leaking to comment three-dot menu */
+ytd-comment-thread-renderer ytd-menu-renderer yt-icon-button,
+ytd-comment-thread-renderer ytd-menu-renderer button,
+ytd-comment-renderer ytd-menu-renderer yt-icon-button,
+ytd-comment-renderer ytd-menu-renderer button,
+ytd-comment-action-buttons-renderer ytd-menu-renderer yt-icon-button,
+ytd-comment-action-buttons-renderer ytd-menu-renderer button {
+    background: none !important;
+    background-color: transparent !important;
+    border: none !important;
+    box-shadow: none !important;
+    outline: none !important;
+}
+

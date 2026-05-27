@@ -1,0 +1,18 @@
+≡ƒº¬ Starting Comprehensive Scenario Verification (VM Mode)...
+
+Testing Watch Tracking...
+Test Execution Error: TypeError: Cannot read properties of undefined (reading '2026-04-03')
+    at testWatchTracking (E:\browser_extentions\youtube_time_tracker\test_all_scenarios.js:115:52)
+    at runAllTests (E:\browser_extentions\youtube_time_tracker\test_all_scenarios.js:90:15)
+    at Object.<anonymous> (E:\browser_extentions\youtube_time_tracker\test_all_scenarios.js:216:1)
+    at Module._compile (node:internal/modules/cjs/loader:1761:14)
+    at Object..js (node:internal/modules/cjs/loader:1893:10)
+    at Module.load (node:internal/modules/cjs/loader:1481:32)
+    at Module._load (node:internal/modules/cjs/loader:1300:12)
+    at TracingChannel.traceSync (node:diagnostics_channel:328:14)
+    at wrapModuleLoad (node:internal/modules/cjs/loader:245:24)
+    at Module.executeUserEntryPoint [as runMain] (node:internal/modules/run_main:154:5)
+ΓöîΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÉ
+Γöé (index) Γöé
+Γö£ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöñ
+ΓööΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÿ

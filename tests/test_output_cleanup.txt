@@ -1,0 +1,13 @@
+≡ƒÜÇ Starting YouTube Time Tracker Integration Tests...
+
+Testing Race Condition Fix...
+Background: State loaded and cleaned.
+   Γ£ô History preserved across race condition.
+Testing Metadata Overwrite Fix...
+   Γ£ô Metadata preserved during transition (mismatch guard worked).
+Testing 7-Day Cleanup Logic...
+Cleaned keys: [ '2026-04-10', '2026-04-04', '2026-04-03', '2026-04-02' ]
+
+Γ¥î TEST FAILED: Error: Cleanup logic failed to purge correct records!
+    at testCleanupLogic (E:\browser_extentions\youtube_time_tracker\test_fixes.js:105:15)
+    at runTests (E:\browser_extentions\youtube_time_tracker\test_fixes.js:61:15)

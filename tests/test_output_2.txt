@@ -1,0 +1,10 @@
+≡ƒÜÇ Starting YouTube Time Tracker Integration Tests...
+
+Testing Race Condition Fix...
+Background: State loaded from storage.
+   Γ£ô History preserved across race condition.
+Testing Metadata Overwrite Fix...
+
+Γ¥î TEST FAILED: TypeError: document.querySelector.mockImplementation is not a function
+    at testMetadataOverwriteFix (E:\browser_extentions\youtube_time_tracker\test_fixes.js:161:28)
+    at runTests (E:\browser_extentions\youtube_time_tracker\test_fixes.js:56:15)

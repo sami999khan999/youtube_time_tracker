@@ -1,0 +1,48 @@
+{
+  "manifest_version": 3,
+  "name": "YouTube Time Tracker",
+  "version": "1.1.0",
+  "description": "Take control of your YouTube experience. Track watch time, analyze viewing habits, and stay focused with an integrated Shorts blocker and intelligent break reminders.",
+  "icons": {
+    "16": "icons/icon128.jpg",
+    "48": "icons/icon128.jpg",
+    "128": "icons/icon128.jpg"
+  },
+  "permissions": ["storage", "webNavigation", "alarms", "unlimitedStorage"],
+  "background": {
+    "service_worker": "dist/background.js"
+  },
+  "host_permissions": [
+    "*://*.youtube.com/*",
+    "https://zenquotes.io/*",
+    "https://returnyoutubedislikeapi.com/*"
+  ],
+
+  "content_scripts": [
+    {
+      "matches": ["*://*.youtube.com/*"],
+      "css": ["dist/content.css"],
+      "js": ["dist/content.js"],
+      "run_at": "document_start"
+    }
+  ],
+  "action": {
+    "default_title": "YouTube Time Tracker",
+    "default_icon": {
+      "16": "icons/icon128.jpg",
+      "32": "icons/icon128.jpg",
+      "48": "icons/icon128.jpg",
+      "128": "icons/icon128.jpg"
+    }
+  },
+  "commands": {
+    "toggle-pip": {
+      "suggested_key": {
+        "default": "Alt+F",
+        "linux": "Ctrl+Shift+F"
+      },
+      "description": "Toggle Floating Modal (PiP)",
+      "global": true
+    }
+  }
+}

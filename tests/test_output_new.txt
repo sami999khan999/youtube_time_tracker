@@ -1,0 +1,33 @@
+≡ƒº¬ Running New Feature Tests...
+
+ΓöÇΓöÇ Test 1: Deletion Watch Time Correction ΓöÇΓöÇ
+   Γ£à Initial watchTime: Expected 500, got 500
+   Γ£à Initial video count: Expected 2, got 2
+   Γ£à watchTime decreased: Expected 200, got 200
+   Γ£à Video removed: Expected 1, got 1
+   Γ£à Remaining video correct
+   Γ£à watchTime is zero: Expected 0, got 0
+   Γ£à No videos left
+   Γ£à Delete non-existent no crash: No crash on missing uid
+   Γ£à Delete zero-duration OK: WatchTime stays 0
+
+ΓöÇΓöÇ Test 2: Re-track Currently Playing Video ΓöÇΓöÇ
+   Γ£à Current video NOT blacklisted: Should not be in deletedUids
+   Γ£à Other video IS blacklisted: Should be in deletedUids
+
+ΓöÇΓöÇ Test 3: Active Time Heartbeat ΓöÇΓöÇ
+   Γ£à activeTime tracks video: Expected 5, got 5
+   Γ£à watchTime matches: Expected 5, got 5
+   Γ£à activeTime includes heartbeats: Expected 8, got 8
+   Γ£à watchTime unchanged by heartbeats: Expected 5, got 5
+   Γ£à activeTime reset on clear: Expected 0, got 0
+
+ΓöÇΓöÇ Test 4: Edge Cases ΓöÇΓöÇ
+   Γ£à Negative delta ignored for watchTime: Expected 100, got 100
+   Γ£à Large delta accepted: Expected 36100, got 36100
+   Γ£à Double delete no crash: Expected 1, got 1
+   Γ£à activeTime preserved after all deletions: Expected 36100
+
+ΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉΓòÉ
+Results: 20 passed, 0 failed out of 20 total
+Γ£à ALL TESTS PASSED

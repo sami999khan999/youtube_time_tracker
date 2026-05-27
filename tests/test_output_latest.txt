@@ -1,0 +1,18 @@
+≡ƒº¬ Starting Comprehensive Scenario Verification (VM Mode)...
+
+Testing Watch Tracking...
+Testing Analytics...
+Test Execution Error: ReferenceError: dayColors is not defined
+    at renderChart (evalmachine.<anonymous>:17:20)
+    at Object.renderAnalyticsView (evalmachine.<anonymous>:79:5)
+    at testAnalytics (E:\browser_extentions\youtube_time_tracker\tests\test_all_scenarios.js:162:17)
+    at runAllTests (E:\browser_extentions\youtube_time_tracker\tests\test_all_scenarios.js:91:15)
+    at process.processTicksAndRejections (node:internal/process/task_queues:103:5)
+ΓöîΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓö¼ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓö¼ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓö¼ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÉ
+Γöé (index) Γöé scenario          Γöé status      Γöé note                         Γöé
+Γö£ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓö╝ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓö╝ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓö╝ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöñ
+Γöé 0       Γöé 'Single Session'  Γöé 'Γ£à PASSED' Γöé 'Tracked 10s correctly.'     Γöé
+Γöé 1       Γöé 'Multi-Tab Sync'  Γöé 'Γ£à PASSED' Γöé 'Aggregated time correctly.' Γöé
+Γöé 2       Γöé 'Cross-Midnight'  Γöé 'Γ¥î FAILED' Γöé 'Split across days.'         Γöé
+Γöé 3       Γöé 'Auto-Play Guard' Γöé 'Γ£à PASSED' Γöé 'Prevented metadata leak.'   Γöé
+ΓööΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓö┤ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓö┤ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓö┤ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÿ
