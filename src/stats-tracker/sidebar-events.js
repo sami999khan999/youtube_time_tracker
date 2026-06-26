@@ -43,6 +43,10 @@ function syncSettingsUI() {
   if (smartFullscreenToggle)
     smartFullscreenToggle.checked = smartFullscreenSettings.enabled;
 
+  const suggestionsToggle = document.getElementById("hide-suggestions-toggle");
+  if (suggestionsToggle)
+    suggestionsToggle.checked = hideSuggestionsSettings.enabled;
+
   const opacityToggle = document.getElementById("opacity-enabled-toggle");
   if (opacityToggle) opacityToggle.checked = opacitySettings.enabled;
 
@@ -563,6 +567,7 @@ function bindSidebarEvents(sidebar, btn, dragStatus) {
             toggleFloating: "Alt+F",
             toggleDislike: "Alt+D",
             toggleShorts: "Alt+B",
+            toggleSuggestions: "Alt+H",
             navHistory: "Alt+Q",
             navAnalytics: "Alt+W",
             navChannels: "Alt+E",
@@ -708,6 +713,16 @@ function bindSidebarEvents(sidebar, btn, dragStatus) {
       e.stopPropagation();
       smartFullscreenSettings.enabled = sfToggle.checked;
       saveSmartFullscreenSettings();
+    };
+  }
+
+  const suggestionsToggle = document.getElementById("hide-suggestions-toggle");
+  if (suggestionsToggle) {
+    suggestionsToggle.onchange = (e) => {
+      e.stopPropagation();
+      hideSuggestionsSettings.enabled = suggestionsToggle.checked;
+      saveSuggestionsSettings();
+      if (typeof applyHideSuggestionsState === "function") applyHideSuggestionsState();
     };
   }
 
@@ -1581,6 +1596,7 @@ function renderKeybinds() {
         { id: "toggleFloating", label: "Floating Mode", desc: "Toggle the resizable PiP video player", icon: icons.pip },
         { id: "toggleDislike", label: "Dislike Counter", desc: "Toggle visibility of the dislike count", icon: icons.dislike },
         { id: "toggleShorts", label: "Shorts Blocker", desc: "Instantly enable/disable the shorts filter", icon: icons.close },
+        { id: "toggleSuggestions", label: "Hide Suggestions", desc: "Remove the suggestions sidebar and center", icon: icons.eye_off || icons.eye },
         { id: "toggleOpacity", label: "Toggle Opacity", desc: "Dim/undim the YouTube background", icon: icons.eye },
         { id: "manualBackup", label: "Manual Backup", desc: "Save a snapshot of your current data", icon: icons.backup }
       ]

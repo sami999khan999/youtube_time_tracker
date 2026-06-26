@@ -30,11 +30,13 @@ let retentionSettings = {
 let dislikeCountSettings = { enabled: true };
 let opacitySettings = { enabled: false, value: 0.5 };
 let smartFullscreenSettings = { enabled: true };
+let hideSuggestionsSettings = { enabled: false };
 let keybindSettings = {
   toggleSidebar: "Alt+S",
   toggleFloating: "Alt+F",
   toggleDislike: "Alt+D",
   toggleShorts: "Alt+B",
+  toggleSuggestions: "Alt+H",
   navHistory: "Alt+Q",
   navAnalytics: "Alt+W",
   navChannels: "Alt+E",
@@ -64,6 +66,7 @@ const loadPromise = new Promise((resolve) => {
       "ytt_dislike_settings",
       "ytt_opacity_settings",
       "ytt_smart_fullscreen_settings",
+      "ytt_suggestions_settings",
       "ytt_keybind_settings",
     ],
     (data) => {
@@ -80,6 +83,8 @@ const loadPromise = new Promise((resolve) => {
           ...retentionSettings,
           ...data.ytt_retention_settings,
         };
+      if (data.ytt_suggestions_settings)
+        hideSuggestionsSettings = { ...hideSuggestionsSettings, ...data.ytt_suggestions_settings };
 
       // Watch for storage changes to keep background memory in sync with UI
       chrome.storage.onChanged.addListener((changes, area) => {
@@ -103,6 +108,8 @@ const loadPromise = new Promise((resolve) => {
           smartFullscreenSettings = changes.ytt_smart_fullscreen_settings.newValue;
         if (changes.ytt_keybind_settings)
           keybindSettings = changes.ytt_keybind_settings.newValue;
+        if (changes.ytt_suggestions_settings)
+          hideSuggestionsSettings = changes.ytt_suggestions_settings.newValue;
       });
 
       // Enforce retention policy on load
@@ -520,6 +527,7 @@ function saveHistoryNow() {
       dislikeCountSettings,
       opacitySettings,
       smartFullscreenSettings,
+      hideSuggestionsSettings,
       keybindSettings
   };
   broadcastFailsafeSync(liveBackup);
@@ -548,6 +556,9 @@ function handleSettingsUpdate(data) {
   } else if (data.type === "opacity") {
     opacitySettings = data.settings;
     storage.local.set({ ytt_opacity_settings: opacitySettings });
+  } else if (data.type === "suggestions") {
+    hideSuggestionsSettings = data.settings;
+    storage.local.set({ ytt_suggestions_settings: hideSuggestionsSettings });
   }
 }
 

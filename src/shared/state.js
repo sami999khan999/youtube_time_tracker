@@ -39,11 +39,15 @@ let retentionSettings = {
 let smartFullscreenSettings = {
   enabled: true,
 };
+let hideSuggestionsSettings = {
+  enabled: false,
+};
 let keybindSettings = {
   toggleSidebar: "Alt+S",
   toggleFloating: "Alt+F",
   toggleDislike: "Alt+D",
   toggleShorts: "Alt+B",
+  toggleSuggestions: "Alt+H",
   navHistory: "Alt+Q",
   navAnalytics: "Alt+W",
   navChannels: "Alt+E",
@@ -92,6 +96,7 @@ async function initState() {
         "ytt_backup_settings",
         "ytt_retention_settings",
         "ytt_smart_fullscreen_settings",
+        "ytt_suggestions_settings",
         "ytt_keybind_settings",
         "ytt_opacity_settings",
         "ytt_migrated",
@@ -191,6 +196,12 @@ async function initState() {
           smartFullscreenSettings = {
             ...smartFullscreenSettings,
             ...data.ytt_smart_fullscreen_settings,
+          };
+        }
+        if (data.ytt_suggestions_settings) {
+          hideSuggestionsSettings = {
+            ...hideSuggestionsSettings,
+            ...data.ytt_suggestions_settings,
           };
         }
         if (data.ytt_keybind_settings) {
@@ -375,6 +386,14 @@ function saveBreakSettings() {
   });
 }
 
+function saveSuggestionsSettings() {
+  safeSendMessage({
+    action: "SAVE_SETTINGS",
+    type: "suggestions",
+    settings: hideSuggestionsSettings,
+  });
+}
+
 function saveBackupSettings() {
   safeSendMessage({
     action: "SAVE_SETTINGS",
@@ -463,6 +482,14 @@ storage.onChanged.addListener((changes, area) => {
           ...{ enabled: false },
           ...(changes.ytt_smart_fullscreen_settings.newValue || {}),
         };
+        needsUIRefresh = true;
+      }
+      if (changes.ytt_suggestions_settings) {
+        hideSuggestionsSettings = {
+          ...{ enabled: false },
+          ...(changes.ytt_suggestions_settings.newValue || {}),
+        };
+        if (typeof applyHideSuggestionsState === "function") applyHideSuggestionsState();
         needsUIRefresh = true;
       }
       if (changes.ytt_opacity_settings) {

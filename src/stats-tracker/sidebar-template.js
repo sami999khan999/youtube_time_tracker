@@ -254,6 +254,19 @@ function getSidebarHTML() {
                         <div class="settings-item">
                             <div class="settings-item-info">
                                 <div class="label-with-icon">
+                                    <span class="item-icon">${icons.eye_off || icons.eye || ""}</span>
+                                    <span class="settings-item-label">Hide Suggestions</span>
+                                </div>
+                                <span class="settings-item-desc">Remove the suggestion sidebar and center the player for focus</span>
+                            </div>
+                            <label class="toggle-switch">
+                                <input type="checkbox" id="hide-suggestions-toggle" ${hideSuggestionsSettings.enabled ? "checked" : ""}>
+                                <span class="toggle-slider"></span>
+                            </label>
+                        </div>
+                        <div class="settings-item">
+                            <div class="settings-item-info">
+                                <div class="label-with-icon">
                                     <span class="item-icon">${icons.expand || ""}</span>
                                     <span class="settings-item-label">Floating Video</span>
                                 </div>

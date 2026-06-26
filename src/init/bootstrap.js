@@ -8,6 +8,7 @@
     applyShortsBlockerState();
     applyDislikeCountState();
     applyOpacityState();
+    if (typeof applyHideSuggestionsState === 'function') applyHideSuggestionsState();
     injectStatsUI();
     setupFullscreenAutoHide();
     if (typeof setupSmartFullscreen === 'function') setupSmartFullscreen();
@@ -66,6 +67,7 @@
         applyShortsBlockerState();
         applyDislikeCountState();
         applyOpacityState();
+        if (typeof applyHideSuggestionsState === 'function') applyHideSuggestionsState();
         injectStatsUI();
         if (typeof applyFloatingPlayerState === 'function') applyFloatingPlayerState();
     });
@@ -73,6 +75,7 @@
         applyShortsBlockerState();
         applyDislikeCountState();
         applyOpacityState();
+        if (typeof applyHideSuggestionsState === 'function') applyHideSuggestionsState();
         injectStatsUI();
         if (typeof applyFloatingPlayerState === 'function') applyFloatingPlayerState();
     });

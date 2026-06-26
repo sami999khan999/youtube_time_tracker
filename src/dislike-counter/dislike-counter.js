@@ -232,10 +232,12 @@ function tryRenderDislike() {
   const likeBtn = findLikeButton();
   if (!dislikeBtn) return;
 
-  const hasLabel = (dislikeBtn.shadowRoot || dislikeBtn).querySelector(".ytt-hijacked-label");
-  if (dislikeBtn.dataset.yttDislikeVideo === videoId && hasLabel) {
-      // Still on same video and label exists - keep it as is.
-      return;
+  // Check if already rendered for this video (check both native slot and custom label)
+  if (dislikeBtn.dataset.yttDislikeVideo === videoId) {
+      const root = dislikeBtn.shadowRoot || dislikeBtn;
+      const hasNativeSlot = root.querySelector("[data-ytt-dislike]");
+      const hasCustomLabel = root.querySelector(".ytt-hijacked-label");
+      if (hasNativeSlot || hasCustomLabel) return;
   }
 
   if (dislikeDataCache[videoId]) {
@@ -261,117 +263,100 @@ function tryRenderDislike() {
   }
 }
 
-function forceVisibility(btn) {
-    // Only force the button element itself and its shadow host ancestors.
-    // Do NOT touch the internal content container (icon parent) — that has
-    // flex layout we manage separately and overwriting it breaks spacing.
-    let curr = btn;
-    for (let i = 0; i < 4; i++) {
-        if (!curr || curr === document.body) break;
-        if (curr.nodeType === 1) {
-            curr.style.setProperty("overflow", "visible", "important");
-            // Only set width/display on the outer wrapper (not inside shadow root)
-            if (!(curr.parentNode instanceof ShadowRoot)) {
-                curr.style.setProperty("width", "auto", "important");
-                curr.style.setProperty("min-width", "unset", "important");
-            }
-        }
-        
-        if (curr.parentNode instanceof ShadowRoot) {
-            curr = curr.parentNode.host;
-        } else {
-            curr = curr.parentElement;
-        }
-    }
-}
-
 function doRender(data, videoId, btn) {
     if (!btn || isButtonInComment(btn)) return;
 
-    // Final sanity check that this is actually a dislike button
     const ariaLabel = (btn.getAttribute("aria-label") || "").toLowerCase();
     const title = (btn.getAttribute("title") || "").toLowerCase();
     if (!ariaLabel.includes("dislike") && !title.includes("dislike")) return;
 
     const countText = formatDislikeCount(data.dislikes);
     const root = btn.shadowRoot || btn;
-    let label = root.querySelector(".ytt-hijacked-label");
-
-    if (!label) {
-        label = document.createElement("span");
-        label.className = "ytt-hijacked-label";
-    }
-
-    const icon = root.querySelector("yt-icon, svg, .yt-spec-button-shape-next__icon");
     const isShorts = window.location.pathname.includes("/shorts");
 
-    if (icon) {
-        // Always re-position: insert right after the icon
-        if (label.previousElementSibling !== icon) {
-            icon.insertAdjacentElement("afterend", label);
+    // Clean up any previously injected custom spans
+    root.querySelectorAll(".ytt-hijacked-label").forEach(l => l.remove());
+    btn.querySelectorAll(".ytt-hijacked-label").forEach(l => l.remove());
+
+    // === Strategy: Use YouTube's native text slot (like Return YouTube Dislike) ===
+    // YouTube's button has a built-in text area that is hidden for the dislike button.
+    // By setting its content and switching the button from "icon-only" to "icon+text"
+    // mode, YouTube's own CSS handles all sizing, spacing, and positioning natively.
+    const textContainer = root.querySelector(
+        ".yt-spec-button-shape-next__button-text-content"
+    );
+
+    if (textContainer && !isShorts) {
+        // Set the count text directly into YouTube's native text slot
+        textContainer.textContent = countText;
+        textContainer.style.setProperty("display", "block", "important");
+        textContainer.setAttribute("data-ytt-dislike", "true");
+
+        // Switch button from icon-only to icon+text mode
+        // This makes YouTube's CSS properly size and space the button
+        if (btn.classList.contains("yt-spec-button-shape-next--icon-button")) {
+            btn.classList.remove("yt-spec-button-shape-next--icon-button");
+            btn.classList.add("yt-spec-button-shape-next--icon-leading");
+            btn.setAttribute("data-ytt-class-swapped", "true");
         }
 
-        // Style the icon's parent as a flex container — run on EVERY render
-        const parent = icon.parentElement;
-        if (parent && parent.nodeType === 1) {
-            parent.style.setProperty("display", "flex", "important");
-            parent.style.setProperty("flex-direction", isShorts ? "column" : "row", "important");
-            parent.style.setProperty("align-items", "center", "important");
-            parent.style.setProperty("justify-content", "flex-start", "important");
-            parent.style.setProperty("flex-wrap", "nowrap", "important");
-            parent.style.setProperty("overflow", "visible", "important");
-            parent.style.removeProperty("gap"); // Let margins handle spacing exclusively
-        }
-
-        // Keep icon stable
-        icon.style.setProperty("flex-shrink", "0", "important");
-        icon.style.setProperty("display", "inline-flex", "important");
-        icon.style.setProperty("margin", "0", "important");
-    } else if (!label.parentElement) {
-        root.appendChild(label);
+        btn.dataset.yttDislikeVideo = videoId;
+        setupObserver();
+        return;
     }
 
-    label.textContent = countText;
-    label.classList.add("ytt-hijacked-label");
-    btn.dataset.yttDislikeVideo = videoId;
+    // === Fallback for Shorts or non-standard layouts ===
+    const icon = root.querySelector("yt-icon, svg, .yt-spec-button-shape-next__icon");
+    if (!icon) {
+        setTimeout(() => {
+            if (dislikeCountSettings && dislikeCountSettings.enabled) {
+                const retryBtn = findDislikeButton();
+                if (retryBtn) doRender(data, videoId, retryBtn);
+            }
+        }, 300);
+        return;
+    }
 
-    // Apply spacing and appearance on EVERY render
+    const label = document.createElement("span");
+    label.className = "ytt-hijacked-label";
+    label.textContent = countText;
+    icon.insertAdjacentElement("afterend", label);
+
+    const parent = icon.parentElement;
+    if (parent && parent.nodeType === 1) {
+        parent.style.setProperty("display", "flex", "important");
+        parent.style.setProperty("flex-direction", isShorts ? "column" : "row", "important");
+        parent.style.setProperty("align-items", "center", "important");
+        parent.style.setProperty("overflow", "visible", "important");
+    }
+
+    icon.style.setProperty("flex-shrink", "0", "important");
+
     label.style.cssText = isShorts
         ? `
             display: block !important;
             margin-top: 4px !important;
-            margin-left: 0 !important;
-            font-family: "Roboto", Arial, sans-serif !important;
+            font-family: inherit !important;
             font-size: 12px !important;
             font-weight: 500 !important;
+            line-height: 1 !important;
             color: inherit !important;
             white-space: nowrap !important;
             pointer-events: none !important;
-            flex-shrink: 0 !important;
-            line-height: 1 !important;
           `
         : `
-            display: inline-flex !important;
-            align-items: center !important;
-            margin-left: 12px !important;
-            margin-right: 0 !important;
-            margin-top: 0 !important;
-            vertical-align: middle !important;
-            line-height: normal !important;
-            opacity: 1 !important;
-            visibility: visible !important;
-            font-family: "Roboto", Arial, sans-serif !important;
+            display: inline-block !important;
+            margin-left: 6px !important;
+            font-family: inherit !important;
             font-size: 14px !important;
             font-weight: 500 !important;
+            line-height: normal !important;
             color: inherit !important;
             white-space: nowrap !important;
             pointer-events: none !important;
-            flex-shrink: 0 !important;
           `;
 
-    forceVisibility(btn);
-    // console.log(`YTT: [Dislike] Rendered ${countText} for video ${videoId}`);
-    
+    btn.dataset.yttDislikeVideo = videoId;
     setupObserver();
 }
 
@@ -383,7 +368,8 @@ function setupObserver() {
             const target = m.target;
             return target.nodeType === 1 && (
                 target.classList.contains("ytt-hijacked-label") || 
-                target.closest?.(".ytt-hijacked-label")
+                target.closest?.(".ytt-hijacked-label") ||
+                target.hasAttribute?.("data-ytt-dislike")
             );
         });
 
@@ -404,8 +390,24 @@ function applyDislikeCountState() {
 }
 
 function removeDislikeCount() {
-    const labels = document.querySelectorAll(".ytt-hijacked-label");
-    labels.forEach(l => l.remove());
+    // Remove custom labels
+    document.querySelectorAll(".ytt-hijacked-label").forEach(l => l.remove());
+
+    // Restore YouTube's native text containers we modified
+    document.querySelectorAll("[data-ytt-dislike]").forEach(el => {
+        el.textContent = "";
+        el.style.removeProperty("display");
+        el.removeAttribute("data-ytt-dislike");
+    });
+
+    // Restore button classes on dislike buttons with our class swap
+    document.querySelectorAll("[data-ytt-class-swapped]").forEach(btn => {
+        btn.classList.remove("yt-spec-button-shape-next--icon-leading");
+        btn.classList.add("yt-spec-button-shape-next--icon-button");
+        btn.removeAttribute("data-ytt-class-swapped");
+        delete btn.dataset.yttDislikeVideo;
+    });
+
     if (globalObserver) {
         globalObserver.disconnect();
         globalObserver = null;

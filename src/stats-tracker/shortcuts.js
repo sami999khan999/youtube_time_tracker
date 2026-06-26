@@ -99,6 +99,17 @@ window.initShortcuts = function() {
                 saveSettingsInStorage();
             }
         }
+        else if (matchesKeybind(e, keybindSettings.toggleSuggestions)) {
+            console.log("YTT: [Match] toggleSuggestions triggered");
+            e.preventDefault();
+            e.stopImmediatePropagation();
+            if (typeof hideSuggestionsSettings !== 'undefined') {
+                hideSuggestionsSettings.enabled = !hideSuggestionsSettings.enabled;
+                if (typeof applyHideSuggestionsState === 'function') applyHideSuggestionsState();
+                if (typeof syncSettingsUI === 'function') syncSettingsUI();
+                saveSuggestionsSettings();
+            }
+        }
         else if (matchesKeybind(e, keybindSettings.toggleOpacity)) {
             console.log("YTT: [Match] toggleOpacity triggered");
             e.preventDefault();
