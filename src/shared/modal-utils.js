@@ -472,7 +472,7 @@ function showMultiTabModal(otherTabId, onKeep) {
             const focusables = [keepBtn, closeOtherBtn];
             const first = focusables[0];
             const last = focusables[focusables.length - 1];
-            
+
             if (e.shiftKey) {
                 if (document.activeElement === first) {
                     last.focus();
@@ -488,5 +488,114 @@ function showMultiTabModal(otherTabId, onKeep) {
         if (e.key === 'Escape') dismiss();
     };
 }
+
+/**
+ * Lightweight auto-dismissing confirmation toast anchored to the bottom-right.
+ * Mirrors the glass styling of showMultiTabToast so it feels native.
+ * @param {Object} opts
+ *   - eyebrow: small uppercase label (e.g. "Backup")
+ *   - message: main descriptive line
+ *   - icon:    inline SVG string (defaults to a checkmark). Stroke should use "currentColor".
+ *   - duration: ms before auto-dismiss (default 2600)
+ *   - accent:  hex accent color (default brand red #e11d48)
+ */
+window.showActionToast = function (opts = {}) {
+    const {
+        eyebrow = 'Done',
+        message = '',
+        icon = null,
+        duration = 2600,
+        accent = '#e11d48',
+    } = opts;
+
+    // Inject keyframes once (separate id from the multi-tab toast).
+    if (!document.getElementById('ytt-action-toast-styles')) {
+        const style = document.createElement('style');
+        style.id = 'ytt-action-toast-styles';
+        style.textContent = `
+            @keyframes ytt-action-toast-in {
+                from { transform: translateY(20px) scale(0.95); opacity: 0; }
+                to   { transform: translateY(0) scale(1);     opacity: 1; }
+            }
+            .ytt-action-toast {
+                animation: ytt-action-toast-in 0.45s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+            }
+        `;
+        document.head.appendChild(style);
+    }
+
+    const defaultIcon = `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>`;
+
+    const innerHTML = `
+        <div style="
+            width: 38px; height: 38px; flex-shrink: 0; color: ${accent};
+            background: ${accent}1f;
+            border: 1px solid ${accent}59;
+            border-radius: 11px;
+            display: flex; align-items: center; justify-content: center;
+        ">${icon || defaultIcon}</div>
+        <div style="flex: 1; min-width: 0;">
+            <div style="font-size: 10px; font-weight: 700; letter-spacing: 1.2px; text-transform: uppercase; color: ${accent}; line-height: 1; margin-bottom: 4px;">${eyebrow}</div>
+            <div style="font-size: 13.5px; font-weight: 500; color: rgba(255,255,255,0.85); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; line-height: 1.3;">${message}</div>
+        </div>
+    `;
+
+    // If a toast is already on screen (e.g. holding the opacity key), update its
+    // content in place and just reset the dismiss timer — no re-append, no
+    // replayed entrance animation, no flicker.
+    const existing = document.getElementById('ytt-action-toast');
+    if (existing) {
+        existing.innerHTML = innerHTML;
+        if (existing._yttTimer) clearTimeout(existing._yttTimer);
+        existing._yttTimer = setTimeout(() => existing._yttRemove(), duration);
+        return existing;
+    }
+
+    const toast = document.createElement('div');
+    toast.id = 'ytt-action-toast';
+    toast.className = 'ytt-action-toast';
+    toast.style.cssText = `
+        position: fixed;
+        bottom: 28px;
+        right: 28px;
+        background: rgba(18, 18, 18, 0.72);
+        backdrop-filter: blur(32px) saturate(200%);
+        -webkit-backdrop-filter: blur(32px) saturate(200%);
+        color: #fff;
+        padding: 14px 18px 14px 16px;
+        border-radius: 20px;
+        border: 1px solid rgba(255,255,255,0.12);
+        border-top: 1px solid rgba(255,255,255,0.2);
+        box-shadow: 0 24px 48px rgba(0,0,0,0.45), 0 0 0 0.5px rgba(0,0,0,0.6);
+        display: flex;
+        align-items: center;
+        gap: 14px;
+        z-index: 999999;
+        font-family: -apple-system, 'Inter', BlinkMacSystemFont, sans-serif;
+        pointer-events: auto;
+        min-width: 240px;
+        max-width: 360px;
+        cursor: pointer;
+    `;
+
+    toast.innerHTML = innerHTML;
+
+    document.body.appendChild(toast);
+
+    const removeToast = () => {
+        if (toast._yttTimer) clearTimeout(toast._yttTimer);
+        toast.style.transition = 'opacity 0.3s ease, transform 0.3s ease';
+        toast.style.opacity = '0';
+        toast.style.transform = 'translateY(10px) scale(0.97)';
+        setTimeout(() => toast.remove(), 350);
+    };
+    // Expose the remover so in-place updates can reuse the same dismissal.
+    toast._yttRemove = removeToast;
+
+    toast._yttTimer = setTimeout(removeToast, duration);
+    toast.onclick = removeToast;
+
+    return toast;
+};
 
 

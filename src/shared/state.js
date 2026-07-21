@@ -55,7 +55,9 @@ let keybindSettings = {
   navSettings: "Alt+T",
   navShortcuts: "Alt+Y",
   manualBackup: "Alt+I",
-  toggleOpacity: "Alt+U"
+  toggleOpacity: "Alt+U",
+  opacityUp: "Alt+=",
+  opacityDown: "Alt+-"
 };
 let opacitySettings = {
   enabled: false,
@@ -80,6 +82,11 @@ let fullSortedVideos = [];
 let loadedVideoCount = 0;
 const historyPageSize = 50;
 let isInfiniteScrolling = false;
+
+// Per-view search queries (lowercased). Empty string = no filter.
+let historySearchQuery = "";
+let channelSearchQuery = "";
+let channelVideosSearchQuery = "";
 
 /**
  * Initializes state from storage.local

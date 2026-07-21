@@ -121,6 +121,18 @@ window.initShortcuts = function() {
                 saveSettingsInStorage();
             }
         }
+        else if (matchesKeybind(e, keybindSettings.opacityUp)) {
+            console.log("YTT: [Match] opacityUp triggered");
+            e.preventDefault();
+            e.stopImmediatePropagation();
+            adjustOpacityLevel(0.05);
+        }
+        else if (matchesKeybind(e, keybindSettings.opacityDown)) {
+            console.log("YTT: [Match] opacityDown triggered");
+            e.preventDefault();
+            e.stopImmediatePropagation();
+            adjustOpacityLevel(-0.05);
+        }
         // New Navigation and System Shortcuts
         else if (matchesKeybind(e, keybindSettings.navHistory)) {
             handleNavShortcut("history");
@@ -175,6 +187,40 @@ window.initShortcuts = function() {
             if (typeof toggleNativePiP === 'function') toggleNativePiP();
         }
     });
+}
+
+// Contrast/half-moon glyph for the opacity toast, matching the app's icon style
+const OPACITY_TOAST_ICON = `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"></circle><path d="M12 3a9 9 0 0 0 0 18z" fill="currentColor" stroke="none"></path></svg>`;
+
+/**
+ * Nudges the "Dim YouTube Base" opacity level up or down via keyboard.
+ * Auto-enables the feature so the change is immediately visible, clamps to a
+ * safe 0.05–1.0 range, syncs the settings UI, and surfaces a brief toast.
+ */
+function adjustOpacityLevel(delta) {
+    if (typeof opacitySettings === 'undefined') return;
+
+    // Enable dimming so the adjustment has a visible effect
+    opacitySettings.enabled = true;
+
+    const current = typeof opacitySettings.value === 'number' ? opacitySettings.value : 0.5;
+    let next = current + delta;
+    // Clamp to 0.05–1.0 so the page never fully disappears
+    next = Math.min(1, Math.max(0.05, Math.round(next * 100) / 100));
+    opacitySettings.value = next;
+
+    if (typeof applyOpacityState === 'function') applyOpacityState();
+    if (typeof syncSettingsUI === 'function') syncSettingsUI();
+    saveSettingsInStorage();
+
+    if (typeof window.showActionToast === 'function') {
+        window.showActionToast({
+            eyebrow: 'Opacity',
+            message: `YouTube visibility set to ${Math.round(next * 100)}%`,
+            icon: OPACITY_TOAST_ICON,
+            duration: 1400,
+        });
+    }
 }
 
 function saveSettingsInStorage() {

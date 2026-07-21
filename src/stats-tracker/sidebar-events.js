@@ -370,6 +370,66 @@ function _switchViewInternal(viewName) {
   if (typeof renderStats === "function") renderStats();
 }
 
+/**
+ * Wires up a list search box: debounced input filtering, a clear button, and
+ * Escape-to-clear. The onChange callback receives the trimmed, lowercased query.
+ */
+const LIST_SEARCH_DEBOUNCE_MS = 250;
+function setupListSearch(inputId, clearId, onChange) {
+  const input = document.getElementById(inputId);
+  if (!input) return;
+  const clearBtn = document.getElementById(clearId);
+
+  let debounceTimer = null;
+
+  // Instant, cheap UI feedback (clear button) — never debounced.
+  const syncClearBtn = () => {
+    if (clearBtn) clearBtn.style.display = input.value ? "flex" : "none";
+  };
+
+  // The expensive part (filter + list rebuild) runs the query through onChange.
+  const runQuery = () => {
+    onChange(input.value.trim().toLowerCase());
+  };
+
+  const cancelPending = () => {
+    if (debounceTimer) {
+      clearTimeout(debounceTimer);
+      debounceTimer = null;
+    }
+  };
+
+  // Debounce filtering while typing so we don't rebuild the list on every keystroke.
+  input.oninput = () => {
+    syncClearBtn();
+    cancelPending();
+    debounceTimer = setTimeout(runQuery, LIST_SEARCH_DEBOUNCE_MS);
+  };
+
+  // Keep typing local: don't let YouTube or global hotkeys hijack keystrokes.
+  input.onkeydown = (e) => {
+    e.stopPropagation();
+    if (e.key === "Escape") {
+      cancelPending();
+      input.value = "";
+      syncClearBtn();
+      runQuery();
+      input.blur();
+    }
+  };
+
+  if (clearBtn) {
+    clearBtn.onclick = (e) => {
+      e.stopPropagation();
+      cancelPending();
+      input.value = "";
+      syncClearBtn();
+      runQuery(); // clearing is immediate, no debounce
+      input.focus();
+    };
+  }
+}
+
 function bindSidebarEvents(sidebar, btn, dragStatus) {
   // Date Navigator & Calendar Logic
   let calendarDate = new Date(); // Month/Year currently shown in the calendar popover
@@ -574,7 +634,10 @@ function bindSidebarEvents(sidebar, btn, dragStatus) {
             navBackup: "Alt+R",
             navSettings: "Alt+T",
             navShortcuts: "Alt+Y",
-            manualBackup: "Alt+U"
+            manualBackup: "Alt+I",
+            toggleOpacity: "Alt+U",
+            opacityUp: "Alt+=",
+            opacityDown: "Alt+-"
           };
           if (typeof safeStorageSet === "function") {
             safeStorageSet({ ytt_keybind_settings: keybindSettings });
@@ -609,6 +672,34 @@ function bindSidebarEvents(sidebar, btn, dragStatus) {
       switchView("channel-distribution");
     };
   }
+
+  // --- List search boxes (History / Channels / Channel Videos) ---
+  setupListSearch("history-search-input", "history-search-clear", (q) => {
+    historySearchQuery = q;
+    lastVideoCount = -1; // force the history list to rebuild with the filter
+    if (typeof renderStats === "function") renderStats();
+  });
+
+  setupListSearch("channel-search-input", "channel-search-clear", (q) => {
+    channelSearchQuery = q;
+    if (
+      typeof renderChannelDistribution === "function" &&
+      typeof getFilteredAnalyticsData === "function"
+    ) {
+      renderChannelDistribution(getFilteredAnalyticsData());
+    }
+  });
+
+  setupListSearch(
+    "channel-videos-search-input",
+    "channel-videos-search-clear",
+    (q) => {
+      channelVideosSearchQuery = q;
+      if (typeof renderChannelVideosView === "function") {
+        renderChannelVideosView(selectedChannelForVideos);
+      }
+    },
+  );
 
   // Remove the old nav-backup-view button listener (no longer in HTML)
 
@@ -1598,6 +1689,8 @@ function renderKeybinds() {
         { id: "toggleShorts", label: "Shorts Blocker", desc: "Instantly enable/disable the shorts filter", icon: icons.close },
         { id: "toggleSuggestions", label: "Hide Suggestions", desc: "Remove the suggestions sidebar and center", icon: icons.eye_off || icons.eye },
         { id: "toggleOpacity", label: "Toggle Opacity", desc: "Dim/undim the YouTube background", icon: icons.eye },
+        { id: "opacityUp", label: "Opacity Up", desc: "Make the YouTube page brighter (less dim)", icon: icons.eye },
+        { id: "opacityDown", label: "Opacity Down", desc: "Make the YouTube page darker (more dim)", icon: icons.eye_off || icons.eye },
         { id: "manualBackup", label: "Manual Backup", desc: "Save a snapshot of your current data", icon: icons.backup }
       ]
     }
@@ -1810,6 +1903,20 @@ window.switchView = function(viewName) {
   _switchViewInternal(viewName);
 };
 
+// Inline SVG for the backup toast (database/save glyph, matches the app's icon style)
+const BACKUP_TOAST_ICON = `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><ellipse cx="12" cy="5" rx="8" ry="3"></ellipse><path d="M4 5v6c0 1.66 3.58 3 8 3s8-1.34 8-3V5"></path><path d="M4 11v6c0 1.66 3.58 3 8 3s8-1.34 8-3v-6"></path></svg>`;
+
+function showBackupToast(response) {
+  if (typeof window.showActionToast !== "function") return;
+  const ok = !response || response.success !== false;
+  window.showActionToast({
+    eyebrow: ok ? "Backup" : "Backup failed",
+    message: ok ? "Snapshot saved successfully" : "Could not create a backup",
+    icon: BACKUP_TOAST_ICON,
+    accent: ok ? "#e11d48" : "#f59e0b",
+  });
+}
+
 window.triggerManualBackup = function() {
   const createBackupBtn = document.getElementById("create-manual-backup");
   if (createBackupBtn) {
@@ -1817,17 +1924,19 @@ window.triggerManualBackup = function() {
     const originalHtml = createBackupBtn.innerHTML;
     createBackupBtn.textContent = "Backing up...";
 
-    safeSendMessage({ action: "CREATE_BACKUP_MANUAL" }, () => {
+    safeSendMessage({ action: "CREATE_BACKUP_MANUAL" }, (response) => {
       createBackupBtn.disabled = false;
       createBackupBtn.innerHTML = originalHtml;
+      showBackupToast(response);
       // Delay slightly to ensure IndexedDB has committed the change
       setTimeout(() => {
         renderBackups();
       }, 100);
     });
   } else {
-    // If btn doesn't exist (not in DOM), just send message
-    safeSendMessage({ action: "CREATE_BACKUP_MANUAL" }, () => {
+    // If btn doesn't exist (not in DOM, e.g. triggered via shortcut), just send message
+    safeSendMessage({ action: "CREATE_BACKUP_MANUAL" }, (response) => {
+       showBackupToast(response);
        setTimeout(() => {
          renderBackups();
        }, 100);

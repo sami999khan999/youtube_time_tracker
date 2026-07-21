@@ -575,8 +575,22 @@ function renderChannelDistribution(data) {
     return;
   }
 
+  // Apply the channel search filter (matches channel name)
+  let channels = data.channels;
+  if (channelSearchQuery) {
+    channels = channels.filter((c) =>
+      ((c.label || c.key) || "").toLowerCase().includes(channelSearchQuery),
+    );
+  }
+
+  if (channels.length === 0) {
+    listEl.innerHTML =
+      '<div class="loading-placeholder">No channels match your search.</div>';
+    return;
+  }
+
   // Sort all channels by value descending
-  const sorted = [...data.channels].sort((a, b) => b.value - a.value);
+  const sorted = [...channels].sort((a, b) => b.value - a.value);
 
   listEl.innerHTML = sorted
     .map((c, index) => {
@@ -635,6 +649,12 @@ function renderChannelDistribution(data) {
     card.onclick = (e) => {
       e.stopPropagation();
       selectedChannelForVideos = card.dataset.channel;
+      // Reset the per-channel video search when opening a different channel
+      channelVideosSearchQuery = "";
+      const cvSearch = document.getElementById("channel-videos-search-input");
+      const cvClear = document.getElementById("channel-videos-search-clear");
+      if (cvSearch) cvSearch.value = "";
+      if (cvClear) cvClear.style.display = "none";
       switchView("channel-videos");
       renderChannelVideosView(selectedChannelForVideos);
     };
@@ -662,9 +682,21 @@ function renderChannelVideosView(channelName) {
     }
   });
 
+  const hasChannelVideos = channelVideos.length > 0;
+
+  // Apply the per-channel video search filter (matches video title)
+  if (channelVideosSearchQuery) {
+    channelVideos = channelVideos.filter((v) =>
+      (v.title || "").toLowerCase().includes(channelVideosSearchQuery),
+    );
+  }
+
   if (channelVideos.length === 0) {
-    listEl.innerHTML =
-      '<div style="text-align:center; padding: 40px; color:#666;">No videos found for this channel in the selected period.</div>';
+    listEl.innerHTML = hasChannelVideos
+      ? '<div style="text-align:center; padding: 40px; color:#666;">No videos match your search.</div>'
+      : '<div style="text-align:center; padding: 40px; color:#666;">No videos found for this channel in the selected period.</div>';
+    fullSortedVideos = [];
+    loadedVideoCount = 0;
     return;
   }
 

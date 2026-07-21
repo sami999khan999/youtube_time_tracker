@@ -89,12 +89,22 @@ function renderStats() {
             lastRenderedFilter = selectedDayFilter;
             lastVideoCount = displayVideos.length;
 
-            if (displayVideos.length === 0) {
-                listEl.innerHTML = '<div style="text-align:center; padding: 40px; color:#666;">No activity recorded for this period.</div>';
+            // Apply the History search filter (matches video title or channel name)
+            const q = historySearchQuery;
+            const filteredVideos = q
+                ? displayVideos.filter(v =>
+                    (v.title || '').toLowerCase().includes(q) ||
+                    (v.channelName || '').toLowerCase().includes(q))
+                : displayVideos;
+
+            if (filteredVideos.length === 0) {
+                listEl.innerHTML = q
+                    ? '<div style="text-align:center; padding: 40px; color:#666;">No videos match your search.</div>'
+                    : '<div style="text-align:center; padding: 40px; color:#666;">No activity recorded for this period.</div>';
                 fullSortedVideos = [];
                 loadedVideoCount = 0;
             } else {
-                fullSortedVideos = displayVideos.slice().sort((a, b) => {
+                fullSortedVideos = filteredVideos.slice().sort((a, b) => {
                     const aTime = a.lastStarted || a.lastUpdated || 0;
                     const bTime = b.lastStarted || b.lastUpdated || 0;
                     return bTime - aTime;

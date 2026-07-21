@@ -1,4 +1,4 @@
-/* Unified Styles Bundle — Built at: 2026-06-26T09:54:50.694Z */
+/* Unified Styles Bundle — Built at: 2026-07-21T09:32:49.490Z */
 
 /* ─── src/shared/theme.css ─── */
 /* === Theme Variables === */
@@ -1245,6 +1245,79 @@ body.yt-shorts-resizing-active {
 
 .header-pill-btn:active {
   transform: translateY(0);
+}
+
+/* List Search Bar (History / Channels / Channel Videos) */
+.list-search-bar {
+  position: relative;
+  display: flex;
+  align-items: center;
+  margin-bottom: 14px;
+}
+
+.list-search-icon {
+  position: absolute;
+  left: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--stats-text-secondary);
+  pointer-events: none;
+}
+
+.list-search-icon svg {
+  width: 16px;
+  height: 16px;
+}
+
+.list-search-input {
+  width: 100%;
+  background: var(--stats-input-bg);
+  border: 1px solid var(--stats-input-border);
+  color: var(--stats-text-primary);
+  padding: 9px 36px 9px 38px;
+  border-radius: 10px;
+  font-size: 13px;
+  font-family: inherit;
+  outline: none;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.list-search-input::placeholder {
+  color: var(--stats-text-secondary);
+  opacity: 0.7;
+}
+
+.list-search-input:focus {
+  border-color: var(--stats-primary);
+  box-shadow: 0 0 0 3px rgba(255, 0, 51, 0.12);
+}
+
+.list-search-clear {
+  position: absolute;
+  right: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  padding: 0;
+  border: none;
+  border-radius: 50%;
+  background: transparent;
+  color: var(--stats-text-secondary);
+  cursor: pointer;
+  transition: background 0.2s ease, color 0.2s ease;
+}
+
+.list-search-clear svg {
+  width: 15px;
+  height: 15px;
+}
+
+.list-search-clear:hover {
+  background: rgba(255, 255, 255, 0.08);
+  color: var(--stats-text-primary);
 }
 
 .icon-back-btn {
@@ -2647,6 +2720,34 @@ body.yt-shorts-resizing-active {
 
 .label-with-icon + .settings-item-desc {
   margin-left: 32px;
+}
+
+/* Label row that carries one or more shortcut chips (no leading icon) */
+.label-with-badges {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-bottom: 4px;
+}
+
+/* Inline keyboard-shortcut chip shown next to a feature label */
+.shortcut-badge {
+  display: inline-flex;
+  align-items: center;
+  height: 18px;
+  padding: 0 7px;
+  border: 1px solid var(--stats-border);
+  border-radius: 5px;
+  background: var(--stats-input-bg, rgba(255, 255, 255, 0.04));
+  color: var(--stats-text-secondary);
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.3px;
+  line-height: 1;
+  white-space: nowrap;
+  text-transform: uppercase;
+  flex-shrink: 0;
 }
 
 /* Inputs & Interactives */

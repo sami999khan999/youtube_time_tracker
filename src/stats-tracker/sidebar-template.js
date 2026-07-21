@@ -1,5 +1,26 @@
 // === Sidebar HTML Template ===
 
+// Renders a subtle keyboard-shortcut chip for a given keybind action id.
+// Returns an empty string when no bind is configured, so it degrades gracefully.
+function shortcutBadge(actionId) {
+  const bind =
+    typeof keybindSettings !== "undefined" && keybindSettings
+      ? keybindSettings[actionId]
+      : null;
+  if (!bind) return "";
+  return `<span class="shortcut-badge" title="Keyboard shortcut">${bind}</span>`;
+}
+
+// Returns a " (Alt+X)" suffix for use inside a title/tooltip on icon-only
+// buttons where a visible chip would crowd the layout. Empty when unbound.
+function keybindHint(actionId) {
+  const bind =
+    typeof keybindSettings !== "undefined" && keybindSettings
+      ? keybindSettings[actionId]
+      : null;
+  return bind ? ` (${bind})` : "";
+}
+
 function getSidebarHTML() {
   return `
         <div class="stats-header">
@@ -11,11 +32,11 @@ function getSidebarHTML() {
                     <h2 id="view-title-text">Stats Tracker</h2>
                 </div>
                 <div class="header-actions">
-                    <button id="nav-history" title="Watch History" class="active">${icons.history}</button>
-                    <button id="nav-analytics" title="Analytics Trends">${icons.analytics}</button>
-                    <button id="nav-backup" title="Backup & Restore">${icons.backup}</button>
-                    <button id="nav-settings" title="Settings">${icons.settings}</button>
-                    <button id="close-stats">${icons.close}</button>
+                    <button id="nav-history" title="Watch History${keybindHint("navHistory")}" class="active">${icons.history}</button>
+                    <button id="nav-analytics" title="Analytics Trends${keybindHint("navAnalytics")}">${icons.analytics}</button>
+                    <button id="nav-backup" title="Backup & Restore${keybindHint("navBackup")}">${icons.backup}</button>
+                    <button id="nav-settings" title="Settings${keybindHint("navSettings")}">${icons.settings}</button>
+                    <button id="close-stats" title="Close${keybindHint("toggleSidebar")}">${icons.close}</button>
                 </div>
             </div>
         </div>
@@ -84,6 +105,11 @@ function getSidebarHTML() {
                     <div class="history-header-row">
                         <h3 id="history-title">Watch History (Today)</h3>
                         <button id="nav-to-channels" class="header-pill-btn">Channels</button>
+                    </div>
+                    <div class="list-search-bar">
+                        <span class="list-search-icon">${icons.search}</span>
+                        <input type="text" id="history-search-input" class="list-search-input" placeholder="Search by video or channel..." autocomplete="off" spellcheck="false">
+                        <button id="history-search-clear" class="list-search-clear" title="Clear search" style="display: none;">${icons.close}</button>
                     </div>
                     <ul id="video-history-list"></ul>
                     <div id="history-loading" class="infinite-scroll-loader" style="display: none;">
@@ -190,6 +216,11 @@ function getSidebarHTML() {
             </div>
 
             <div id="channel-distribution-view" style="display: none;">
+                <div class="list-search-bar">
+                    <span class="list-search-icon">${icons.search}</span>
+                    <input type="text" id="channel-search-input" class="list-search-input" placeholder="Search channels..." autocomplete="off" spellcheck="false">
+                    <button id="channel-search-clear" class="list-search-clear" title="Clear search" style="display: none;">${icons.close}</button>
+                </div>
                 <div id="full-channel-list" class="detailed-channel-list">
                     <div class="loading-placeholder">Loading distribution...</div>
                 </div>
@@ -199,6 +230,11 @@ function getSidebarHTML() {
                 <div class="video-list-container">
                     <div class="history-header-row">
                         <h3 id="channel-videos-title">Channel Videos</h3>
+                    </div>
+                    <div class="list-search-bar">
+                        <span class="list-search-icon">${icons.search}</span>
+                        <input type="text" id="channel-videos-search-input" class="list-search-input" placeholder="Search videos in this channel..." autocomplete="off" spellcheck="false">
+                        <button id="channel-videos-search-clear" class="list-search-clear" title="Clear search" style="display: none;">${icons.close}</button>
                     </div>
                     <ul id="channel-videos-list"></ul>
                     <div id="channel-videos-loading" class="infinite-scroll-loader" style="display: none;">
@@ -217,6 +253,7 @@ function getSidebarHTML() {
                                 <div class="label-with-icon">
                                     <span class="item-icon">${icons.close}</span>
                                     <span class="settings-item-label">Shorts Blocker</span>
+                                    ${shortcutBadge("toggleShorts")}
                                 </div>
                                 <span class="settings-item-desc">Hide all YouTube Shorts from feeds and ignore Shorts pages</span>
                             </div>
@@ -243,6 +280,7 @@ function getSidebarHTML() {
                                 <div class="label-with-icon">
                                     <span class="item-icon">${icons.dislike}</span>
                                     <span class="settings-item-label">Show Dislike Count</span>
+                                    ${shortcutBadge("toggleDislike")}
                                 </div>
                                 <span class="settings-item-desc">Bring back the YouTube dislike count using the RYD API</span>
                             </div>
@@ -256,6 +294,7 @@ function getSidebarHTML() {
                                 <div class="label-with-icon">
                                     <span class="item-icon">${icons.eye_off || icons.eye || ""}</span>
                                     <span class="settings-item-label">Hide Suggestions</span>
+                                    ${shortcutBadge("toggleSuggestions")}
                                 </div>
                                 <span class="settings-item-desc">Remove the suggestion sidebar and center the player for focus</span>
                             </div>
@@ -269,6 +308,7 @@ function getSidebarHTML() {
                                 <div class="label-with-icon">
                                     <span class="item-icon">${icons.expand || ""}</span>
                                     <span class="settings-item-label">Floating Video</span>
+                                    ${shortcutBadge("toggleFloating")}
                                 </div>
                                 <span class="settings-item-desc">Enable a floating, resizable player window (Control bar button)</span>
                             </div>
@@ -282,8 +322,9 @@ function getSidebarHTML() {
                                 <div class="label-with-icon">
                                     <span class="item-icon">${icons.eye || ""}</span>
                                     <span class="settings-item-label">Dim YouTube Base</span>
+                                    ${shortcutBadge("toggleOpacity")}
                                 </div>
-                                <span class="settings-item-desc">Reduce YouTube content opacity (Shortcut available)</span>
+                                <span class="settings-item-desc">Reduce YouTube content opacity</span>
                             </div>
                             <label class="toggle-switch">
                                 <input type="checkbox" id="opacity-enabled-toggle" ${opacitySettings.enabled ? "checked" : ""}>
@@ -292,7 +333,11 @@ function getSidebarHTML() {
                         </div>
                         <div class="settings-item vertical opacity-slider-item" id="opacity-slider-container" style="${opacitySettings.enabled ? "" : "display: none;"}">
                             <div class="settings-item-info">
-                                <span class="settings-item-label">Opacity Level</span>
+                                <div class="label-with-badges">
+                                    <span class="settings-item-label">Opacity Level</span>
+                                    ${shortcutBadge("opacityDown")}
+                                    ${shortcutBadge("opacityUp")}
+                                </div>
                                 <span class="settings-item-desc">Adjust how transparent YouTube becomes (0.0 - 1.0)</span>
                             </div>
                             <div class="slider-input-wrapper">
@@ -311,6 +356,7 @@ function getSidebarHTML() {
                                 <div class="label-with-icon">
                                     <span class="item-icon">${icons.settings}</span>
                                     <span class="settings-item-label">Hotkeys & Shortcuts</span>
+                                    ${shortcutBadge("navShortcuts")}
                                 </div>
                                 <span class="settings-item-desc">Customize keyboard shortcuts for all features</span>
                             </div>
@@ -567,7 +613,7 @@ function getSidebarHTML() {
                             <button id="import-backup-json" class="small-action-btn secondary">
                                 ${icons.download} Import JSON
                             </button>
-                            <button id="create-manual-backup" class="small-action-btn">
+                            <button id="create-manual-backup" class="small-action-btn" title="New Backup${keybindHint("manualBackup")}">
                                 ${icons.backup} New Backup
                             </button>
                             <input type="file" id="backup-file-input" accept=".json" style="display: none;">
