@@ -546,7 +546,13 @@ window.showActionToast = function (opts = {}) {
     const existing = document.getElementById('ytt-action-toast');
     if (existing) {
         existing.innerHTML = innerHTML;
+        // Cancel both the dismiss timer and any in-progress fade-out removal,
+        // and restore full visibility in case it was mid-fade.
         if (existing._yttTimer) clearTimeout(existing._yttTimer);
+        if (existing._yttRemoveTimer) clearTimeout(existing._yttRemoveTimer);
+        existing.style.transition = 'opacity 0.2s ease, transform 0.2s ease';
+        existing.style.opacity = '1';
+        existing.style.transform = 'translateY(0) scale(1)';
         existing._yttTimer = setTimeout(() => existing._yttRemove(), duration);
         return existing;
     }
@@ -587,7 +593,7 @@ window.showActionToast = function (opts = {}) {
         toast.style.transition = 'opacity 0.3s ease, transform 0.3s ease';
         toast.style.opacity = '0';
         toast.style.transform = 'translateY(10px) scale(0.97)';
-        setTimeout(() => toast.remove(), 350);
+        toast._yttRemoveTimer = setTimeout(() => toast.remove(), 350);
     };
     // Expose the remover so in-place updates can reuse the same dismissal.
     toast._yttRemove = removeToast;

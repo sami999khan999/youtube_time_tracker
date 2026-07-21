@@ -79,18 +79,27 @@ async function toggleNativePiP() {
 
   try {
     const video = document.querySelector("video");
-    if (!video) return;
+    if (!video) {
+      console.warn("YTT: No video element found for PiP toggle.");
+      return;
+    }
 
+    // Exiting PiP
     if (document.pictureInPictureElement) {
       console.log("YTT: Exiting Picture-in-Picture mode...");
-      await document.exitPictureInPicture();
-      // Ensure the video is brought back into view ("bring it back up")
-      video.scrollIntoView({ behavior: "smooth", block: "center" });
-    } else {
-      if (document.pictureInPictureEnabled) {
-        console.log("YTT: Entering Picture-in-Picture mode...");
+      try {
+        await document.exitPictureInPicture();
+        // Ensure the video is brought back into view ("bring it back up")
+        video.scrollIntoView({ behavior: "smooth", block: "center" });
+      } catch (err) {
+        console.error("YTT: Failed to exit Picture-in-Picture:", err);
+      }
+    }
+    // Entering PiP
+    else if (document.pictureInPictureEnabled) {
+      console.log("YTT: Entering Picture-in-Picture mode...");
+      try {
         await video.requestPictureInPicture();
-
         // Ensure we handle when the user closes the PiP window manually
         video.addEventListener(
           "leavepictureinpicture",
@@ -99,14 +108,31 @@ async function toggleNativePiP() {
           },
           { once: true },
         );
-      } else {
-        console.warn(
-          "YTT: Picture-in-Picture is not supported in this browser.",
-        );
+      } catch (err) {
+        // Common error cases:
+        // - NotAllowedError: requires user interaction (e.g., video not playing, or permission denied)
+        // - NotSupportedError: video element in a cross-origin context
+        // - InvalidStateError: video element in fullscreen or has an invalid state
+        const errorName = err.name || "Unknown";
+        if (errorName === "NotAllowedError") {
+          console.warn(
+            "YTT: PiP denied. Video may need to be playing, or permission was denied.",
+          );
+        } else if (errorName === "InvalidStateError") {
+          console.warn(
+            "YTT: PiP failed. Video element is in an invalid state (e.g., fullscreen, hidden, or cross-origin).",
+          );
+        } else {
+          console.error(`YTT: Failed to enter Picture-in-Picture (${errorName}):`, err);
+        }
       }
+    } else {
+      console.warn(
+        "YTT: Picture-in-Picture is not supported in this browser or context.",
+      );
     }
   } catch (err) {
-    console.error("YTT: Failed to toggle Picture-in-Picture:", err);
+    console.error("YTT: Unexpected error during PiP toggle:", err);
   } finally {
     // Release the lock after a short delay to prevent double-triggering from multiple sources (keydown + command)
     setTimeout(() => {
