@@ -233,8 +233,13 @@ function saveSettingsInStorage() {
             ytt_keybind_settings: keybindSettings,
             ytt_opacity_settings: opacitySettings
         });
-        try {
-            localStorage.setItem("ytt_opacity_fast_path", JSON.stringify(opacitySettings));
-        } catch (e) {}
+        // Refresh the synchronous fast-path caches (opacity + suggestions + shorts)
+        if (typeof writeVisualFastPath === 'function') {
+            writeVisualFastPath();
+        } else {
+            try {
+                localStorage.setItem("ytt_opacity_fast_path", JSON.stringify(opacitySettings));
+            } catch (e) {}
+        }
     }
 }

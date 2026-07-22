@@ -496,10 +496,23 @@ function renderWatchDistribution(data) {
     };
   }
 
-  // Interaction for legend items
+  // Interaction for legend items: hover highlights the slice, click opens the
+  // channel's videos (same behavior as the detailed channel cards).
   pieLegend.querySelectorAll(".legend-item").forEach((item, idx) => {
     item.onmouseenter = () => updatePieHighlight(idx);
     item.onmouseleave = () => updatePieHighlight(-1);
+    item.onclick = (e) => {
+      e.stopPropagation();
+      selectedChannelForVideos = item.dataset.channel;
+      // Reset the per-channel video search when opening a different channel
+      channelVideosSearchQuery = "";
+      const cvSearch = document.getElementById("channel-videos-search-input");
+      const cvClear = document.getElementById("channel-videos-search-clear");
+      if (cvSearch) cvSearch.value = "";
+      if (cvClear) cvClear.style.display = "none";
+      switchView("channel-videos");
+      renderChannelVideosView(selectedChannelForVideos);
+    };
   });
 
   // Interaction

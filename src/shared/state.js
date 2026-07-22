@@ -224,6 +224,10 @@ async function initState() {
           };
         }
 
+        // Refresh the synchronous fast-path caches so the next load / hard
+        // reload can apply these visual states before first paint.
+        writeVisualFastPath();
+
         console.log("YouTube Time Tracker: State initialized from storage.");
         resolve();
       },
@@ -375,6 +379,7 @@ function saveShortsBlockerSettings() {
     type: "shorts",
     settings: shortsBlockerSettings,
   });
+  writeVisualFastPath();
 }
 
 function saveDislikeCountSettings() {
@@ -399,6 +404,7 @@ function saveSuggestionsSettings() {
     type: "suggestions",
     settings: hideSuggestionsSettings,
   });
+  writeVisualFastPath();
 }
 
 function saveBackupSettings() {
@@ -415,8 +421,30 @@ function saveOpacitySettings() {
     type: "opacity",
     settings: opacitySettings,
   });
+  writeVisualFastPath();
+}
+
+/**
+ * Caches the visual feature states to localStorage so they can be applied
+ * SYNCHRONOUSLY at document_start on the next load — before first paint —
+ * eliminating flicker and layout shift. Mirrors the original opacity
+ * fast-path. Readers live at the end of state.js (opacity),
+ * suggestions.js (hide suggestions), and blocker.js (shorts).
+ */
+function writeVisualFastPath() {
   try {
-    localStorage.setItem("ytt_opacity_fast_path", JSON.stringify(opacitySettings));
+    localStorage.setItem(
+      "ytt_opacity_fast_path",
+      JSON.stringify(opacitySettings),
+    );
+    localStorage.setItem(
+      "ytt_suggestions_fast_path",
+      JSON.stringify(hideSuggestionsSettings),
+    );
+    localStorage.setItem(
+      "ytt_shorts_fast_path",
+      JSON.stringify(shortsBlockerSettings),
+    );
   } catch (e) {}
 }
 
@@ -433,6 +461,7 @@ storage.onChanged.addListener((changes, area) => {
   try {
     if (area === "local") {
       let needsUIRefresh = false;
+      let visualChanged = false;
 
       if (changes.ytt_history) {
         allHistory = changes.ytt_history.newValue || {};
@@ -445,6 +474,7 @@ storage.onChanged.addListener((changes, area) => {
         shortsBlockerSettings.enabled = newValue.enabled;
         applyShortsBlockerState(); // Live apply shorts blocker toggle
         needsUIRefresh = true;
+        visualChanged = true;
       }
       if (changes.ytt_dislike_settings) {
         const newValue = changes.ytt_dislike_settings.newValue;
@@ -498,6 +528,7 @@ storage.onChanged.addListener((changes, area) => {
         };
         if (typeof applyHideSuggestionsState === "function") applyHideSuggestionsState();
         needsUIRefresh = true;
+        visualChanged = true;
       }
       if (changes.ytt_opacity_settings) {
         opacitySettings = {
@@ -506,7 +537,11 @@ storage.onChanged.addListener((changes, area) => {
         };
         applyOpacityState();
         needsUIRefresh = true;
+        visualChanged = true;
       }
+
+      // Keep the synchronous fast-path caches in sync across tabs.
+      if (visualChanged) writeVisualFastPath();
 
       // Only re-render if the stats panel is actually open
       if (needsUIRefresh && isStatsOpen) {
@@ -542,7 +577,16 @@ function applyOpacityState() {
   if (!styleEl) {
     styleEl = document.createElement("style");
     styleEl.id = OPACITY_STYLE_ID;
-    const target = document.head || document.documentElement;
+  }
+
+  // Keep our tag as the LAST child of <head>. On a hard reload the fast-path
+  // injects it into <html> (before <head> exists); YouTube's own stylesheets
+  // then load into <head> LATER in document order and — for equal-specificity
+  // !important rules — win the cascade, canceling our dim. Re-homing the tag to
+  // the end of <head> (once it exists) makes our rule the last declared, so it
+  // wins the tie. Harmless no-op once it is already last.
+  const target = document.head || document.documentElement;
+  if (styleEl.parentNode !== target || target.lastElementChild !== styleEl) {
     target.appendChild(styleEl);
   }
 
@@ -572,6 +616,19 @@ try {
     if (cached && cached.enabled) {
       opacitySettings = cached;
       applyOpacityState();
+
+      // Re-assert during the boot window: <head> and YouTube's own stylesheets
+      // are created after this document_start pass, so re-run applyOpacityState
+      // for ~1.5s to keep our tag last in <head> and beat late-loading styles.
+      if (typeof requestAnimationFrame === "function") {
+        let frames = 0;
+        const reassert = () => {
+          if (!opacitySettings.enabled) return;
+          applyOpacityState();
+          if (++frames < 90) requestAnimationFrame(reassert);
+        };
+        requestAnimationFrame(reassert);
+      }
     }
   }
 } catch (e) {}

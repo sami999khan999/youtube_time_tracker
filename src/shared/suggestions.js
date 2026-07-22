@@ -79,3 +79,18 @@ function applyHideSuggestionsState() {
     styleEl.textContent = css;
   }
 }
+
+// === ZERO-LATENCY FAST PATH: hide suggestions before first paint ===
+// Runs synchronously at document_start (before initState's async storage read
+// resolves), so the "Hide Suggestions" layout is applied with no flicker or
+// layout shift on hard reload / navigation via our own links.
+try {
+  const fastPath = localStorage.getItem("ytt_suggestions_fast_path");
+  if (fastPath) {
+    const cached = JSON.parse(fastPath);
+    if (cached && cached.enabled) {
+      hideSuggestionsSettings = { ...hideSuggestionsSettings, ...cached };
+      applyHideSuggestionsState();
+    }
+  }
+} catch (e) {}

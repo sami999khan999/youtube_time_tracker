@@ -139,3 +139,18 @@ function hideShortsShelves() {
         }
     });
 }
+
+// === ZERO-LATENCY FAST PATH: inject shorts-blocker CSS before first paint ===
+// Runs synchronously at document_start so the hiding CSS is present before
+// YouTube renders, preventing Shorts shelves from flashing in. The JS-based
+// removal (blockShorts) still runs later via the MutationObserver.
+try {
+    const fastPath = localStorage.getItem("ytt_shorts_fast_path");
+    if (fastPath) {
+        const cached = JSON.parse(fastPath);
+        if (cached && cached.enabled) {
+            shortsBlockerSettings = { ...shortsBlockerSettings, ...cached };
+            injectShortsBlockerCSS();
+        }
+    }
+} catch (e) {}

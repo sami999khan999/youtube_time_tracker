@@ -1,4 +1,4 @@
-/* Unified Styles Bundle — Built at: 2026-07-21T12:53:59.339Z */
+/* Unified Styles Bundle — Built at: 2026-07-22T05:10:51.068Z */
 
 /* ─── src/shared/theme.css ─── */
 /* === Theme Variables === */
@@ -2727,27 +2727,39 @@ body.yt-shorts-resizing-active {
   display: flex;
   align-items: center;
   gap: 8px;
-  flex-wrap: wrap;
   margin-bottom: 4px;
 }
 
-/* Inline keyboard-shortcut chip shown next to a feature label */
+/*
+ * Keyboard-shortcut keycap shown right after a feature label. Kept inline and
+ * tight to the title so it reads as a hint belonging to that label. Sized to
+ * the label's cap-height and nudged up a hair for optical centering.
+ */
 .shortcut-badge {
   display: inline-flex;
   align-items: center;
-  height: 18px;
-  padding: 0 7px;
+  height: 17px;
+  padding: 0 6px;
   border: 1px solid var(--stats-border);
   border-radius: 5px;
-  background: var(--stats-input-bg, rgba(255, 255, 255, 0.04));
+  background: rgba(255, 255, 255, 0.05);
   color: var(--stats-text-secondary);
-  font-size: 10px;
+  font-family: "SF Mono", "Cascadia Code", "Consolas", ui-monospace, monospace;
+  font-size: 9.5px;
   font-weight: 600;
-  letter-spacing: 0.3px;
+  letter-spacing: 0.2px;
   line-height: 1;
   white-space: nowrap;
   text-transform: uppercase;
   flex-shrink: 0;
+  position: relative;
+  top: -1px;
+  opacity: 0.85;
+}
+
+/* Tighten the gap between the label text and its shortcut keycap. */
+.label-with-icon .settings-item-label + .shortcut-badge {
+  margin-left: -4px;
 }
 
 /* Inputs & Interactives */
