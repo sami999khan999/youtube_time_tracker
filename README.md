@@ -36,6 +36,42 @@ A premium, accessibility-first Chrome extension designed to help you take contro
 - **Total Scroll Management**: Automatically hides the YouTube scrollbar and locks page scrolling when the sidebar or modals are active.
 - **Draggable & Resizable**: Move the toggle button anywhere and pull the sidebar width to suit your workspace (300px to 800px).
 
+### 7. Customizable Hotkeys & Shortcuts
+- **Full Keyboard Control**: Instantly open views, toggle features, and adjust page dimming with fast keyboard shortcuts.
+- **Interactive Remapping**: Click any shortcut in the extension settings to remap it to your preferred key combo.
+
+---
+
+## ⌨️ Keyboard Shortcuts
+
+YouTube Time Tracker includes custom global and in-page hotkeys for rapid navigation and feature control. You can customize any keybinding from the **Settings > Hotkeys & Shortcuts** panel (`Alt+Y`).
+
+### Navigation Shortcuts
+
+| Action | Default Keybind | Description |
+| :--- | :---: | :--- |
+| **Watch History** | `Alt + Q` | Open the Watch History timeline |
+| **Analytics Stats** | `Alt + W` | View watch trends, distribution charts, and heatmap |
+| **Channels View** | `Alt + E` | Open watch time breakdown by channel |
+| **Backups & Sync** | `Alt + R` | Manage backups, export, and import data |
+| **Settings Menu** | `Alt + T` | Open general configuration preferences |
+| **Hotkeys / Shortcuts** | `Alt + Y` | Open shortcut remapping settings page |
+
+### Feature & Control Shortcuts
+
+| Action | Default Keybind | Description |
+| :--- | :---: | :--- |
+| **Toggle Sidebar** | `Alt + S` | Open or close the time tracker sidebar |
+| **Floating Video (PiP)** | `Alt + F` | Toggle floating video player window (`Ctrl+Shift+F` on Linux) |
+| **Shorts Blocker** | `Alt + B` | Instantly toggle Shorts filter on/off |
+| **Dislike Counter** | `Alt + D` | Toggle visibility of video dislike count |
+| **Hide Suggestions** | `Alt + H` | Toggle hiding YouTube recommended videos feed |
+| **Toggle Base Opacity** | `Alt + U` | Dim or undim YouTube background page |
+| **Increase Opacity** | `Alt + =` | Increase YouTube page brightness (+5% opacity) |
+| **Decrease Opacity** | `Alt + -` | Decrease YouTube page brightness (-5% opacity) |
+| **Manual Backup** | `Alt + I` | Save a snapshot backup of your current history & settings |
+| **Cancel / Close** | `Esc` | Cancel keybind remapping recording or close active modals |
+
 ---
 
 ## 🛠 Technical Architecture
