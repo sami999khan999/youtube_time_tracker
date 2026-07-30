@@ -48,29 +48,113 @@ YouTube Time Tracker includes custom global and in-page hotkeys for rapid naviga
 
 ### Navigation Shortcuts
 
-| Action | Default Keybind | Description |
-| :--- | :---: | :--- |
-| **Watch History** | `Alt + Q` | Open the Watch History timeline |
-| **Analytics Stats** | `Alt + W` | View watch trends, distribution charts, and heatmap |
-| **Channels View** | `Alt + E` | Open watch time breakdown by channel |
-| **Backups & Sync** | `Alt + R` | Manage backups, export, and import data |
-| **Settings Menu** | `Alt + T` | Open general configuration preferences |
-| **Hotkeys / Shortcuts** | `Alt + Y` | Open shortcut remapping settings page |
+<table width="100%">
+  <thead>
+    <tr>
+      <th align="left" width="25%">Action</th>
+      <th align="center" width="20%">Default Keybind</th>
+      <th align="left" width="55%">Description</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><b>Watch History</b></td>
+      <td align="center"><code>Alt + Q</code></td>
+      <td>Open the Watch History timeline</td>
+    </tr>
+    <tr>
+      <td><b>Analytics Stats</b></td>
+      <td align="center"><code>Alt + W</code></td>
+      <td>View watch trends, distribution charts, and heatmap</td>
+    </tr>
+    <tr>
+      <td><b>Channels View</b></td>
+      <td align="center"><code>Alt + E</code></td>
+      <td>Open watch time breakdown by channel</td>
+    </tr>
+    <tr>
+      <td><b>Backups & Sync</b></td>
+      <td align="center"><code>Alt + R</code></td>
+      <td>Manage backups, export, and import data</td>
+    </tr>
+    <tr>
+      <td><b>Settings Menu</b></td>
+      <td align="center"><code>Alt + T</code></td>
+      <td>Open general configuration preferences</td>
+    </tr>
+    <tr>
+      <td><b>Hotkeys / Shortcuts</b></td>
+      <td align="center"><code>Alt + Y</code></td>
+      <td>Open shortcut remapping settings page</td>
+    </tr>
+  </tbody>
+</table>
+
+<br>
 
 ### Feature & Control Shortcuts
 
-| Action | Default Keybind | Description |
-| :--- | :---: | :--- |
-| **Toggle Sidebar** | `Alt + S` | Open or close the time tracker sidebar |
-| **Floating Video (PiP)** | `Alt + F` | Toggle floating video player window (`Ctrl+Shift+F` on Linux) |
-| **Shorts Blocker** | `Alt + B` | Instantly toggle Shorts filter on/off |
-| **Dislike Counter** | `Alt + D` | Toggle visibility of video dislike count |
-| **Hide Suggestions** | `Alt + H` | Toggle hiding YouTube recommended videos feed |
-| **Toggle Base Opacity** | `Alt + U` | Dim or undim YouTube background page |
-| **Increase Opacity** | `Alt + =` | Increase YouTube page brightness (+5% opacity) |
-| **Decrease Opacity** | `Alt + -` | Decrease YouTube page brightness (-5% opacity) |
-| **Manual Backup** | `Alt + I` | Save a snapshot backup of your current history & settings |
-| **Cancel / Close** | `Esc` | Cancel keybind remapping recording or close active modals |
+<table width="100%">
+  <thead>
+    <tr>
+      <th align="left" width="25%">Action</th>
+      <th align="center" width="20%">Default Keybind</th>
+      <th align="left" width="55%">Description</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><b>Toggle Sidebar</b></td>
+      <td align="center"><code>Alt + S</code></td>
+      <td>Open or close the time tracker sidebar</td>
+    </tr>
+    <tr>
+      <td><b>Floating Video (PiP)</b></td>
+      <td align="center"><code>Alt + F</code></td>
+      <td>Toggle floating video player window (<code>Ctrl+Shift+F</code> on Linux)</td>
+    </tr>
+    <tr>
+      <td><b>Shorts Blocker</b></td>
+      <td align="center"><code>Alt + B</code></td>
+      <td>Instantly toggle Shorts filter on/off</td>
+    </tr>
+    <tr>
+      <td><b>Dislike Counter</b></td>
+      <td align="center"><code>Alt + D</code></td>
+      <td>Toggle visibility of video dislike count</td>
+    </tr>
+    <tr>
+      <td><b>Hide Suggestions</b></td>
+      <td align="center"><code>Alt + H</code></td>
+      <td>Toggle hiding YouTube recommended videos feed</td>
+    </tr>
+    <tr>
+      <td><b>Toggle Base Opacity</b></td>
+      <td align="center"><code>Alt + U</code></td>
+      <td>Dim or undim YouTube background page</td>
+    </tr>
+    <tr>
+      <td><b>Increase Opacity</b></td>
+      <td align="center"><code>Alt + =</code></td>
+      <td>Increase YouTube page brightness (+5% opacity)</td>
+    </tr>
+    <tr>
+      <td><b>Decrease Opacity</b></td>
+      <td align="center"><code>Alt + -</code></td>
+      <td>Decrease YouTube page brightness (-5% opacity)</td>
+    </tr>
+    <tr>
+      <td><b>Manual Backup</b></td>
+      <td align="center"><code>Alt + I</code></td>
+      <td>Save a snapshot backup of your current history & settings</td>
+    </tr>
+    <tr>
+      <td><b>Cancel / Close</b></td>
+      <td align="center"><code>Esc</code></td>
+      <td>Cancel keybind remapping recording or close active modals</td>
+    </tr>
+  </tbody>
+</table>
 
 ---
 
