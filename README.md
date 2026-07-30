@@ -48,12 +48,12 @@ YouTube Time Tracker includes custom global and in-page hotkeys for rapid naviga
 
 ### Navigation Shortcuts
 
-<table width="100%">
+<table style="width:100%">
   <thead>
     <tr>
-      <th align="left" width="25%">Action</th>
-      <th align="center" width="20%">Default Keybind</th>
-      <th align="left" width="55%">Description</th>
+      <th align="left">Action</th>
+      <th align="center">Default Keybind</th>
+      <th align="left">Description</th>
     </tr>
   </thead>
   <tbody>
@@ -94,12 +94,12 @@ YouTube Time Tracker includes custom global and in-page hotkeys for rapid naviga
 
 ### Feature & Control Shortcuts
 
-<table width="100%">
+<table style="width:100%">
   <thead>
     <tr>
-      <th align="left" width="25%">Action</th>
-      <th align="center" width="20%">Default Keybind</th>
-      <th align="left" width="55%">Description</th>
+      <th align="left">Action</th>
+      <th align="center">Default Keybind</th>
+      <th align="left">Description</th>
     </tr>
   </thead>
   <tbody>
