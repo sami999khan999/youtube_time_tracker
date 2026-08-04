@@ -77,6 +77,16 @@ html[dark], [dark] {
     height: 1px !important;
 }
 
+/* === Page Scroll Lock (sidebar / modals) ===
+   Must target <html>, not just <body>: the "Hide Suggestions" stylesheet sets
+   `html { overflow-x: hidden !important }`, which stops the viewport from
+   inheriting <body>'s overflow and makes a body-only lock a no-op. The
+   `html.` prefix also out-specifies that rule so overflow-x stays locked. */
+html.ytt-scroll-locked,
+html.ytt-scroll-locked > body.ytt-scroll-locked {
+    overflow: hidden !important;
+}
+
 body.stats-sidebar-active::-webkit-scrollbar {
     width: 0 !important;
     height: 0 !important;

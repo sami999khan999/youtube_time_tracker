@@ -93,6 +93,7 @@ let channelVideosSearchQuery = "";
  * Handles migration from localStorage if necessary.
  */
 async function initState() {
+  loadDeletedUids();
   return new Promise((resolve) => {
     safeStorageGet(
       [
@@ -302,6 +303,14 @@ runtime.onMessage.addListener((request) => {
     if (isStatsOpen) {
       renderStats();
     }
+  } else if (request.action === "VIDEO_DELETED") {
+    // Another tab deleted this video — stop reporting it from this tab too,
+    // otherwise whichever tab is playing it immediately re-creates the entry.
+    blacklistDeletedUid(request.uid);
+    if (isStatsOpen) {
+      lastVideoCount = -1; // force a list rebuild
+      renderStats();
+    }
   } else if (request.action === "SYNC_FAILSAFE") {
     updateFailsafeBackup(request.data);
   }
@@ -348,10 +357,63 @@ function saveHistory() {
   safeSendMessage({ action: "REPORT_WATCH_TIME", delta: 0 });
 }
 
+// Blacklisted uids live in sessionStorage so a hard reload of the same tab
+// doesn't resurrect a video the user just deleted while still sitting on its
+// watch page. Navigating to a different video clears the list (see tracking.js).
+const DELETED_UIDS_KEY = "ytt_deleted_uids";
+
+function loadDeletedUids() {
+  try {
+    const raw = sessionStorage.getItem(DELETED_UIDS_KEY);
+    if (raw) deletedUids = new Set(JSON.parse(raw));
+  } catch (e) {}
+}
+
+function persistDeletedUids() {
+  try {
+    sessionStorage.setItem(
+      DELETED_UIDS_KEY,
+      JSON.stringify(Array.from(deletedUids)),
+    );
+  } catch (e) {}
+}
+
+function clearDeletedUids() {
+  if (deletedUids.size === 0) return;
+  deletedUids.clear();
+  persistDeletedUids();
+}
+
+/**
+ * Blacklists a uid and drops it from the in-memory history mirror.
+ * Applies to the currently playing video too — otherwise the next tracking
+ * tick re-creates the entry with zeroed stats right after the deletion.
+ */
+function blacklistDeletedUid(uid) {
+  if (!uid) return;
+  deletedUids.add(uid);
+  persistDeletedUids();
+
+  // Remove locally so the sidebar updates immediately, before the background's
+  // broadcast lands (and before the next tick can re-add it).
+  Object.keys(allHistory).forEach((day) => {
+    const bucket = allHistory[day];
+    if (!bucket || !bucket.videos) return;
+    const idx = bucket.videos.findIndex((v) => v.uid === uid);
+    if (idx === -1) return;
+    const removed = bucket.videos[idx];
+    if (removed.watchedDuration > 0) {
+      bucket.watchTime = Math.max(
+        0,
+        (bucket.watchTime || 0) - removed.watchedDuration,
+      );
+    }
+    bucket.videos.splice(idx, 1);
+  });
+}
+
 function deleteHistoryVideo(uid) {
-  if (uid !== currentUid) {
-    deletedUids.add(uid);
-  }
+  blacklistDeletedUid(uid);
   safeSendMessage({ action: "DELETE_VIDEO", uid });
 }
 

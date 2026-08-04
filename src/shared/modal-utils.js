@@ -137,7 +137,7 @@ function showConfirmModal({ title, message, confirmText = 'Confirm', cancelText 
     document.body.appendChild(overlay);
 
     // Lock Scroll & Selection
-    document.body.style.overflow = 'hidden';
+    lockPageScroll('confirm-modal');
     document.body.style.userSelect = 'none';
 
     const cancelBtn = document.getElementById('modal-cancel');
@@ -146,9 +146,10 @@ function showConfirmModal({ title, message, confirmText = 'Confirm', cancelText 
     const dismiss = () => {
         overlay.classList.remove('visible');
         
-        // Only clear global styles if this is the last modal or sidebar
+        // The scroll lock is per-owner, so releasing ours can't unlock the
+        // sidebar's; userSelect is global, so only clear it when we're last.
+        unlockPageScroll('confirm-modal');
         if (isolationStack.length <= 1) {
-            document.body.style.overflow = '';
             document.body.style.userSelect = '';
         }
         
@@ -232,15 +233,13 @@ function showAlertModal({ title, message, buttonText = 'Got it', icon = '⚠️'
     `;
 
     document.body.appendChild(overlay);
-    document.body.style.overflow = 'hidden';
+    lockPageScroll('alert-modal');
 
     const okBtn = document.getElementById('modal-ok');
     const dismiss = () => {
         overlay.classList.remove('visible');
-        
-        if (isolationStack.length <= 1) {
-            document.body.style.overflow = '';
-        }
+
+        unlockPageScroll('alert-modal');
 
         restoreIsolation();
         setTimeout(() => overlay.remove(), 300);
@@ -433,17 +432,15 @@ function showMultiTabModal(otherTabId, onKeep) {
     `;
 
     document.body.appendChild(overlay);
-    document.body.style.overflow = 'hidden';
+    lockPageScroll('multitab-modal');
 
     const keepBtn = document.getElementById('modal-keep-this');
     const closeOtherBtn = document.getElementById('modal-close-other');
 
     const dismiss = () => {
         overlay.classList.remove('visible');
-        
-        if (isolationStack.length <= 1) {
-            document.body.style.overflow = '';
-        }
+
+        unlockPageScroll('multitab-modal');
 
         restoreIsolation();
         setTimeout(() => overlay.remove(), 400);

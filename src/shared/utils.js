@@ -11,3 +11,31 @@ function formatTime(seconds) {
     }
     return `${m}:${s < 10 ? '0' + s : s}`;
 }
+
+// === Page Scroll Lock ===
+// Named locks so nested owners (sidebar + modal) can't unlock each other.
+const activeScrollLocks = new Set();
+
+function applyScrollLockState() {
+    const locked = activeScrollLocks.size > 0;
+    document.documentElement.classList.toggle('ytt-scroll-locked', locked);
+    if (document.body) document.body.classList.toggle('ytt-scroll-locked', locked);
+}
+
+/**
+ * Locks page scrolling. The class is applied to <html> as well as <body>:
+ * "Hide Suggestions" sets `html { overflow-x: hidden }`, and once <html>'s
+ * overflow is no longer `visible` the viewport stops inheriting <body>'s
+ * overflow — so a body-only lock leaves the page scrollable.
+ * @param {string} owner - Identifier of whatever requested the lock.
+ */
+function lockPageScroll(owner = 'default') {
+    activeScrollLocks.add(owner);
+    applyScrollLockState();
+}
+
+/** Releases this owner's lock; scrolling resumes once no owners remain. */
+function unlockPageScroll(owner = 'default') {
+    activeScrollLocks.delete(owner);
+    applyScrollLockState();
+}

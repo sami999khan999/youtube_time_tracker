@@ -67,7 +67,7 @@ function showBreakModal(quote) {
   document.body.appendChild(overlay);
 
   // Prevent background scroll and selection
-  document.body.style.overflow = "hidden";
+  lockPageScroll("break-modal");
   document.body.style.userSelect = "none";
 
   const modal = overlay.querySelector(".break-modal");
@@ -131,7 +131,7 @@ function showBreakModal(quote) {
 
   const dismissModal = () => {
     overlay.classList.remove("visible");
-    document.body.style.overflow = ""; // Restore scroll
+    unlockPageScroll("break-modal"); // Restore scroll
     document.body.style.userSelect = ""; // Restore selection
 
     if (window.innerWidth <= 600) {

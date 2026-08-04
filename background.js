@@ -325,7 +325,29 @@ function getDayKey(date = new Date()) {
   return `${year}-${month}-${day}`;
 }
 
+// Recently deleted uids -> deletion timestamp. A REPORT_WATCH_TIME message can
+// already be in flight when DELETE_VIDEO arrives, which would re-create the
+// entry a moment after it was removed. Tombstones swallow those stragglers.
+const deletedVideoTombstones = new Map();
+const DELETE_TOMBSTONE_MS = 5000;
+
+function isRecentlyDeleted(uid) {
+  const deletedAt = deletedVideoTombstones.get(uid);
+  if (deletedAt === undefined) return false;
+  if (Date.now() - deletedAt > DELETE_TOMBSTONE_MS) {
+    deletedVideoTombstones.delete(uid);
+    return false;
+  }
+  return true;
+}
+
 function handleDeleteVideo(uid) {
+  deletedVideoTombstones.set(uid, Date.now());
+  // Prune expired tombstones so the map can't grow unbounded.
+  for (const [key, ts] of deletedVideoTombstones) {
+    if (Date.now() - ts > DELETE_TOMBSTONE_MS) deletedVideoTombstones.delete(key);
+  }
+
   Object.keys(allHistory).forEach((key) => {
     const videoIndex = allHistory[key].videos.findIndex((v) => v.uid === uid);
     if (videoIndex !== -1) {
@@ -340,6 +362,29 @@ function handleDeleteVideo(uid) {
     }
   });
   storage.local.set({ ytt_history: allHistory });
+
+  // Tell every tab to blacklist the uid (so the tab actually playing it stops
+  // reporting) and push the pruned history so open sidebars update instantly.
+  broadcastVideoDeleted(uid);
+  broadcastHistoryToTabs();
+}
+
+/**
+ * Notifies all YouTube tabs that a video was removed from history.
+ */
+function broadcastVideoDeleted(uid) {
+  tabs.query({ url: "*://*.youtube.com/*" }, (allTabs) => {
+    allTabs.forEach((tab) => {
+      if (!tab.url || !tab.url.includes("youtube.com")) return;
+      try {
+        chrome.tabs.sendMessage(tab.id, { action: "VIDEO_DELETED", uid }, () => {
+          // Ignore errors (tab might be closed or not loaded yet)
+          if (chrome.runtime.lastError) {
+          }
+        });
+      } catch (e) {}
+    });
+  });
 }
 
 function handleClearHistory() {
@@ -379,7 +424,7 @@ function handleWatchTimeReport(data) {
   const uid = `${currentDay}_${videoId}`;
   let videoEntry = todayData.videos.find((v) => v.uid === uid);
 
-  if (!videoEntry && videoId) {
+  if (!videoEntry && videoId && !isRecentlyDeleted(uid)) {
     videoEntry = {
       uid: uid,
       id: videoId,

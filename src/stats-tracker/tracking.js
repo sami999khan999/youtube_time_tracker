@@ -51,7 +51,7 @@ function updateStats(explicitVideoId, isFinalSync) {
       if (isNewVideo) {
         lastVideoId = videoId;
         // New video loaded — old deletions no longer relevant
-        deletedUids.clear();
+        clearDeletedUids();
       }
 
       const videoTitleEl =

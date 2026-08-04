@@ -1369,7 +1369,7 @@ function bindSidebarEvents(sidebar, btn, dragStatus) {
       sidebar.classList.remove("open");
       btn.classList.remove("active");
       document.body.classList.remove("stats-sidebar-active");
-      document.body.style.overflow = "";
+      unlockPageScroll("stats-sidebar");
       if (typeof restoreIsolation === "function") restoreIsolation();
     };
   }
@@ -1381,7 +1381,7 @@ function bindSidebarEvents(sidebar, btn, dragStatus) {
       sidebar.classList.remove("open");
       btn.classList.remove("active");
       document.body.classList.remove("stats-sidebar-active");
-      document.body.style.overflow = "";
+      unlockPageScroll("stats-sidebar");
       if (typeof restoreIsolation === "function") restoreIsolation();
     }
   });
@@ -1431,7 +1431,7 @@ function bindSidebarEvents(sidebar, btn, dragStatus) {
       sidebar.classList.remove("open");
       btn.classList.remove("active");
       document.body.classList.remove("stats-sidebar-active");
-      document.body.style.overflow = "";
+      unlockPageScroll("stats-sidebar");
       if (typeof restoreIsolation === "function") restoreIsolation();
     }
   });
@@ -1441,7 +1441,7 @@ function bindSidebarEvents(sidebar, btn, dragStatus) {
     // Already handled by global lock if open
   };
   sidebar.onmouseleave = () => {
-    if (!isStatsOpen) document.body.style.overflow = "";
+    if (!isStatsOpen) unlockPageScroll("stats-sidebar");
   };
 
   // Initial UI sync
@@ -1883,14 +1883,14 @@ window.toggleStats = function() {
   if (isStatsOpen) {
     closeAllActivePopups();
     document.body.classList.add("stats-sidebar-active");
-    document.body.style.overflow = "hidden";
+    lockPageScroll("stats-sidebar");
     if (typeof renderStats === "function") renderStats();
     if (typeof isolateModal === "function") isolateModal(sidebar);
     // Auto-focus sidebar for keyboard navigation
     setTimeout(() => sidebar.focus(), 300);
   } else {
     document.body.classList.remove("stats-sidebar-active");
-    document.body.style.overflow = "";
+    unlockPageScroll("stats-sidebar");
     if (typeof restoreIsolation === "function") restoreIsolation();
   }
 };
