@@ -1,4 +1,4 @@
-/* Unified Styles Bundle — Built at: 2026-08-04T15:58:18.403Z */
+/* Unified Styles Bundle — Built at: 2026-08-07T18:26:17.827Z */
 
 /* ─── src/shared/theme.css ─── */
 /* === Theme Variables === */
@@ -575,6 +575,13 @@ ytd-comment-action-buttons-renderer ytd-menu-renderer button {
 
 #stats-toggle-btn.active {
     display: none !important;
+}
+
+/* Fullscreen auto-hide. Uses !important with id+class specificity so it beats
+   the page-dim style tag, which pins #stats-toggle-btn to opacity: 1 !important. */
+#stats-toggle-btn.ytt-auto-hidden {
+    opacity: 0 !important;
+    pointer-events: none !important;
 }
 
 #stats-toggle-btn.dragging {

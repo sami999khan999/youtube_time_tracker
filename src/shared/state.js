@@ -80,6 +80,10 @@ let isFetchingQuote = false;
 let deletedUids = new Set();
 let fullSortedVideos = [];
 let loadedVideoCount = 0;
+// uids already dropped from the rendered lists without a rebuild. Tracked so the
+// list bookkeeping is adjusted exactly once per video: the tab that performs the
+// delete also receives the background's VIDEO_DELETED broadcast for it.
+let inPlaceRemovedUids = new Set();
 const historyPageSize = 50;
 let isInfiniteScrolling = false;
 
@@ -308,7 +312,11 @@ runtime.onMessage.addListener((request) => {
     // otherwise whichever tab is playing it immediately re-creates the entry.
     blacklistDeletedUid(request.uid);
     if (isStatsOpen) {
-      lastVideoCount = -1; // force a list rebuild
+      // Drop the row in place — rebuilding the list would reload it from page 1
+      // and throw away the scroll position. No-op if this tab already removed it.
+      if (typeof removeVideoItemByUid === "function") {
+        removeVideoItemByUid(request.uid);
+      }
       renderStats();
     }
   } else if (request.action === "SYNC_FAILSAFE") {

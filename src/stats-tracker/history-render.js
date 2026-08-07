@@ -88,6 +88,8 @@ function renderStats() {
             lastRenderedView = activeView;
             lastRenderedFilter = selectedDayFilter;
             lastVideoCount = displayVideos.length;
+            // The rebuild bakes in every deletion so far; start counting afresh.
+            inPlaceRemovedUids.clear();
 
             // Apply the History search filter (matches video title or channel name)
             const q = historySearchQuery;
@@ -290,13 +292,65 @@ function createVideoItemElement(v) {
                 icon: '🗑️',
                 onConfirm: () => {
                     deleteHistoryVideo(uid);
-                    lastVideoCount = -1; // Force rebuild
+                    // Drop just this row instead of forcing a rebuild — a rebuild
+                    // reloads the list from page 1 and loses the scroll position.
+                    removeVideoItemElement(li);
                     renderStats();
                 }
             });
         };
     }
     return li;
+}
+
+/**
+ * Removes a single video row in place, keeping the list's scroll position and
+ * its infinite-scroll bookkeeping intact. Shared by the History and
+ * Channel Videos lists, which both render rows via createVideoItemElement.
+ */
+function removeVideoItemElement(li) {
+    const listEl = li.parentElement;
+
+    li.remove();
+    forgetVideoFromLists(li.dataset.uid, true);
+
+    if (listEl && !listEl.querySelector('.history-item')) {
+        const emptyMessage = listEl.id === 'channel-videos-list'
+            ? 'No videos found for this channel in the selected period.'
+            : 'No activity recorded for this period.';
+        listEl.innerHTML = `<div style="text-align:center; padding: 40px; color:#666;">${emptyMessage}</div>`;
+    }
+}
+
+/**
+ * Same as removeVideoItemElement but located by uid — used when another tab
+ * deletes a video, where the row may not be rendered in this tab at all.
+ */
+function removeVideoItemByUid(uid) {
+    if (!uid) return;
+    const li = document.querySelector(`.history-item[data-uid="${uid}"]`);
+    if (li) removeVideoItemElement(li);
+    else forgetVideoFromLists(uid, false);
+}
+
+/**
+ * Keeps the list bookkeeping in step with a video that is gone from the data.
+ * Without the lastVideoCount adjustment the next render tick would see a
+ * changed video count, rebuild the whole list and jump back to the top.
+ */
+function forgetVideoFromLists(uid, wasRendered) {
+    if (!uid || inPlaceRemovedUids.has(uid)) return; // already accounted for
+    inPlaceRemovedUids.add(uid);
+
+    const idx = fullSortedVideos.findIndex(v => v.uid === uid);
+    if (idx !== -1) {
+        fullSortedVideos.splice(idx, 1);
+        if (wasRendered && idx < loadedVideoCount) {
+            loadedVideoCount = Math.max(0, loadedVideoCount - 1);
+        }
+    }
+
+    if (lastVideoCount > 0) lastVideoCount--;
 }
 
 function appendHistoryBatch() {

@@ -35,6 +35,13 @@
     display: none !important;
 }
 
+/* Fullscreen auto-hide. Uses !important with id+class specificity so it beats
+   the page-dim style tag, which pins #stats-toggle-btn to opacity: 1 !important. */
+#stats-toggle-btn.ytt-auto-hidden {
+    opacity: 0 !important;
+    pointer-events: none !important;
+}
+
 #stats-toggle-btn.dragging {
     cursor: grabbing;
     transform: scale(1.15);
