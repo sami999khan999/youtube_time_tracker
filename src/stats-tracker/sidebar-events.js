@@ -53,6 +53,10 @@ function syncSettingsUI() {
   const opacitySlider = document.getElementById("opacity-value-slider");
   if (opacitySlider) {
     opacitySlider.value = opacitySettings.value;
+    // The input snaps off-step values (e.g. 0.42 saved under the old 1% step)
+    // to the nearest 5%. Adopt what it snapped to so the thumb, the label and
+    // the stored value cannot disagree.
+    opacitySettings.value = Math.round(parseFloat(opacitySlider.value) * 100) / 100;
     updateSliderProgress(opacitySlider);
   }
 
@@ -830,7 +834,7 @@ function bindSidebarEvents(sidebar, btn, dragStatus) {
         opacitySliderContainer.style.display = opacityToggle.checked ? "flex" : "none";
       }
       saveOpacitySettings();
-      applyOpacityState();
+      applyOpacityState({ animate: true });
     };
   }
 
@@ -840,7 +844,8 @@ function bindSidebarEvents(sidebar, btn, dragStatus) {
 
     opacitySlider.oninput = (e) => {
       e.stopPropagation();
-      const val = parseFloat(opacitySlider.value);
+      // Round: stepping a range input accumulates float noise (0.35000000000000003).
+      const val = Math.round(parseFloat(opacitySlider.value) * 100) / 100;
       opacitySettings.value = val;
       if (opacityLabel) {
         opacityLabel.textContent = Math.round(val * 100) + "%";
@@ -854,12 +859,13 @@ function bindSidebarEvents(sidebar, btn, dragStatus) {
       if (e.key === "ArrowLeft" || e.key === "ArrowRight") {
         e.stopPropagation();
         e.preventDefault();
-        const step = 0.01;
+        // Matches the slider step and the Alt+= / Alt+- shortcuts: 5% a nudge.
+        const step = 0.05;
         const current = parseFloat(opacitySlider.value);
         if (e.key === "ArrowRight") {
           opacitySlider.value = Math.min(1, current + step);
         } else {
-          opacitySlider.value = Math.max(0, current - step);
+          opacitySlider.value = Math.max(0.05, current - step);
         }
         // Trigger input event to update UI and state
         opacitySlider.dispatchEvent(new Event('input', { bubbles: true }));

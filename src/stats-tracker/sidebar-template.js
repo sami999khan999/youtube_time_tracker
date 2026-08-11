@@ -338,10 +338,10 @@ function getSidebarHTML() {
                                     ${shortcutBadge("opacityDown")}
                                     ${shortcutBadge("opacityUp")}
                                 </div>
-                                <span class="settings-item-desc">Adjust how transparent YouTube becomes (0.0 - 1.0)</span>
+                                <span class="settings-item-desc">Adjust how transparent YouTube becomes (5% - 100%)</span>
                             </div>
                             <div class="slider-input-wrapper">
-                                <input type="range" id="opacity-value-slider" min="0" max="1" step="0.01" value="${opacitySettings.value}">
+                                <input type="range" id="opacity-value-slider" min="0.05" max="1" step="0.05" value="${opacitySettings.value}">
                                 <span id="opacity-percentage-label">${Math.round(opacitySettings.value * 100)}%</span>
                             </div>
                         </div>

@@ -92,6 +92,7 @@ const CSS_FILES = [
     'src/stats-tracker/dashboard.css',
     'src/stats-tracker/charts.css',
     'src/settings/settings.css',
+    'src/settings/opacity.css',
     'src/break-reminder/break-modal.css',
     'src/init/responsive.css'
 ];

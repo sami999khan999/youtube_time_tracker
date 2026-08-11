@@ -634,48 +634,51 @@ function saveSmartFullscreenSettings() {
   safeStorageSet({ ytt_smart_fullscreen_settings: smartFullscreenSettings });
 }
 
-function applyOpacityState() {
-  const OPACITY_STYLE_ID = "ytt-opacity-style-tag";
-  let styleEl = document.getElementById(OPACITY_STYLE_ID);
+/**
+ * Turns the page dimmer on/off.
+ *
+ * All the styling lives in settings/opacity.css, which ships inside
+ * dist/content.css and is therefore loaded by the browser at document_start,
+ * before first paint. This function only has to flip two properties on <html>
+ * — an element that already exists when a content script first runs and that
+ * YouTube never rebuilds — so the dim is in place on the very first frame of a
+ * hard reload and survives SPA navigation untouched.
+ *
+ * @param {{animate?: boolean}} [options] Fade the change in. Off by default:
+ *   on load/navigation a transition would *animate* the change, stretching an
+ *   invisible switch into a visible fade. Only deliberate user toggles animate.
+ */
+function applyOpacityState(options) {
+  const animate = !!(options && options.animate);
+  const root = document.documentElement;
+  if (!root) return;
+
+  // Legacy: pre-overlay versions injected a <style> tag. Drop it if present so
+  // its nested-opacity rules cannot stack on top of the overlay.
+  const legacy = document.getElementById("ytt-opacity-style-tag");
+  if (legacy) legacy.remove();
+
+  if (animate) {
+    root.style.setProperty("--ytt-dim-transition", "opacity 0.3s ease");
+  } else {
+    root.style.removeProperty("--ytt-dim-transition");
+  }
 
   if (!opacitySettings.enabled) {
-    if (styleEl) styleEl.remove();
-    // Rely on the removal of the style tag to revert background color
+    root.removeAttribute("data-ytt-dim");
+    root.style.removeProperty("--ytt-dim-alpha");
+    root.style.removeProperty("--ytt-dim-brightness");
     return;
   }
 
-  if (!styleEl) {
-    styleEl = document.createElement("style");
-    styleEl.id = OPACITY_STYLE_ID;
-  }
+  // Clamp: a stored value outside 0–1 would blank the page out entirely.
+  const value = Math.min(Math.max(Number(opacitySettings.value) || 0, 0.05), 1);
 
-  // Keep our tag as the LAST child of <head>. On a hard reload the fast-path
-  // injects it into <html> (before <head> exists); YouTube's own stylesheets
-  // then load into <head> LATER in document order and — for equal-specificity
-  // !important rules — win the cascade, canceling our dim. Re-homing the tag to
-  // the end of <head> (once it exists) makes our rule the last declared, so it
-  // wins the tie. Harmless no-op once it is already last.
-  const target = document.head || document.documentElement;
-  if (styleEl.parentNode !== target || target.lastElementChild !== styleEl) {
-    target.appendChild(styleEl);
-  }
-
-  const css = `
-    ytd-app, #content, #page-manager {
-      opacity: ${opacitySettings.value} !important;
-      transition: opacity 0.3s ease !important;
-    }
-    body, ytd-app {
-      background-color: #000 !important;
-    }
-    #stats-sidebar, #stats-toggle-btn, .stats-tooltip, .confirm-modal-overlay {
-      opacity: 1 !important;
-    }
-  `;
-
-  if (styleEl.textContent !== css) {
-    styleEl.textContent = css;
-  }
+  // The overlay is black at (1 - value) alpha, which renders identically to
+  // the content itself at `value` opacity over black.
+  root.style.setProperty("--ytt-dim-alpha", String(1 - value));
+  root.style.setProperty("--ytt-dim-brightness", String(value));
+  if (!root.hasAttribute("data-ytt-dim")) root.setAttribute("data-ytt-dim", "");
 }
 
 // === ZERO-LATENCY FAST PATH: Apply opacity instantly on load ===
@@ -685,20 +688,10 @@ try {
     const cached = JSON.parse(fastPath);
     if (cached && cached.enabled) {
       opacitySettings = cached;
+      // Two property writes on <html>, which already exists — nothing to wait
+      // for, nothing to re-assert. The rules themselves came in with
+      // dist/content.css, so the dim is live from the first painted frame.
       applyOpacityState();
-
-      // Re-assert during the boot window: <head> and YouTube's own stylesheets
-      // are created after this document_start pass, so re-run applyOpacityState
-      // for ~1.5s to keep our tag last in <head> and beat late-loading styles.
-      if (typeof requestAnimationFrame === "function") {
-        let frames = 0;
-        const reassert = () => {
-          if (!opacitySettings.enabled) return;
-          applyOpacityState();
-          if (++frames < 90) requestAnimationFrame(reassert);
-        };
-        requestAnimationFrame(reassert);
-      }
     }
   }
 } catch (e) {}

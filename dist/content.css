@@ -1,4 +1,4 @@
-/* Unified Styles Bundle — Built at: 2026-08-07T18:26:17.827Z */
+/* Unified Styles Bundle — Built at: 2026-08-11T12:25:05.990Z */
 
 /* ─── src/shared/theme.css ─── */
 /* === Theme Variables === */
@@ -3437,6 +3437,54 @@ body.yt-shorts-resizing-active {
 
 .ytt-player-tooltip.visible {
   opacity: 1;
+}
+
+
+/* ─── src/settings/opacity.css ─── */
+/* ─── Page Dimmer ───────────────────────────────────────────────────────────
+ *
+ * Ships inside dist/content.css, which the manifest declares as a
+ * document_start content-script stylesheet. The browser therefore has these
+ * rules loaded BEFORE the page's first paint, with no JavaScript involved —
+ * turning the dim on is just a matter of setting two properties on <html>
+ * (see applyOpacityState in shared/state.js).
+ *
+ * Why an overlay instead of `opacity` on ytd-app:
+ *   `ytd-app`, `#content` and `#page-manager` are NESTED, so their opacities
+ *   multiplied — 0.5 rendered as 0.5³. As the DOM streamed in (hard reload) or
+ *   was rebuilt (SPA navigation), those layers appeared one at a time, so the
+ *   page started bright and stepped darker: the flash. This overlay hangs off
+ *   <html>, which exists at document_start and is never rebuilt, so the dim
+ *   level is identical on the first frame and every frame after.
+ *
+ * The math is equivalent to the old approach: black at alpha (1 - value)
+ * over a color renders the same as that color at opacity `value` over black.
+ */
+
+html[data-ytt-dim]::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  background: #000;
+  /* 0 = untouched, 1 = fully black. Set inline on <html> by the fast path. */
+  opacity: var(--ytt-dim-alpha, 0);
+  /* `none` unless a deliberate user toggle asked for a fade — during load and
+     navigation an animation would stretch an invisible switch into a visible
+     one. */
+  transition: var(--ytt-dim-transition, none);
+  pointer-events: none; /* never intercept clicks, hovers or scrolls */
+  /* Below the sidebar / toggle button / modals (2147483646+), above YouTube. */
+  z-index: 2147483000;
+}
+
+/*
+ * A fullscreen element is promoted to the top layer, which paints above any
+ * position: fixed overlay — so dim it directly. brightness(v) matches the
+ * overlay's result exactly, and applies to a single element, so it cannot
+ * compound the way the old nested-opacity rules did.
+ */
+html[data-ytt-dim] :fullscreen {
+  filter: brightness(var(--ytt-dim-brightness, 1)) !important;
 }
 
 

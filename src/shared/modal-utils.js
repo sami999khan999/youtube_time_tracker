@@ -348,7 +348,7 @@ function showMultiTabToast(otherTabId, onDismiss) {
         display: flex;
         align-items: center;
         gap: 14px;
-        z-index: 999999;
+        z-index: 2147483646; /* above the page dimmer — see settings/opacity.css */
         font-family: -apple-system, 'Inter', BlinkMacSystemFont, sans-serif;
         pointer-events: auto;
         min-width: 320px;
@@ -573,7 +573,10 @@ window.showActionToast = function (opts = {}) {
         display: flex;
         align-items: center;
         gap: 14px;
-        z-index: 999999;
+        /* Above the page dimmer (2147483000, see settings/opacity.css) — this
+           toast reports the opacity level, so it must stay legible at any
+           dim setting instead of being dimmed along with the page. */
+        z-index: 2147483646;
         font-family: -apple-system, 'Inter', BlinkMacSystemFont, sans-serif;
         pointer-events: auto;
         min-width: 240px;

@@ -116,7 +116,7 @@ window.initShortcuts = function() {
             e.stopImmediatePropagation();
             if (typeof opacitySettings !== 'undefined') {
                 opacitySettings.enabled = !opacitySettings.enabled;
-                if (typeof applyOpacityState === 'function') applyOpacityState();
+                if (typeof applyOpacityState === 'function') applyOpacityState({ animate: true });
                 if (typeof syncSettingsUI === 'function') syncSettingsUI();
                 saveSettingsInStorage();
             }
@@ -204,9 +204,11 @@ function adjustOpacityLevel(delta) {
     opacitySettings.enabled = true;
 
     const current = typeof opacitySettings.value === 'number' ? opacitySettings.value : 0.5;
-    let next = current + delta;
+    // Snap to the 5% grid the slider uses, so a legacy value like 0.42 lands on
+    // 0.45 / 0.40 rather than carrying its offset forward forever.
+    let next = Math.round((current + delta) * 20) / 20;
     // Clamp to 0.05–1.0 so the page never fully disappears
-    next = Math.min(1, Math.max(0.05, Math.round(next * 100) / 100));
+    next = Math.min(1, Math.max(0.05, next));
     opacitySettings.value = next;
 
     if (typeof applyOpacityState === 'function') applyOpacityState();
