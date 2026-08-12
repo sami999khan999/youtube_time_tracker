@@ -1,6 +1,11 @@
 // === Constants: Colors & SVG Icons ===
 
 const SHORTS_BLOCKER_CSS_ID = "yt-shorts-blocker-dynamic-css";
+// NOTE: Never hide a *container* that also holds non-Shorts content.
+// In particular ytd-item-section-renderer wraps the ENTIRE search result list,
+// so hiding it because it happens to contain a Shorts shelf blanks the page.
+// Only shelves that are exclusively Shorts, and individual Shorts items,
+// may be hidden.
 const SHORTS_BLOCKER_CSS = `
 /* Hiding Shorts Sidebar Entries */
 ytd-guide-entry-renderer:has(a[href="/shorts"]),
@@ -11,53 +16,30 @@ ytd-mini-guide-entry-renderer:has(a[title="Shorts"]) {
 }
 /* Hiding Home Feed Shorts Sections */
 ytd-rich-shelf-renderer[is-shorts],
-ytd-rich-section-renderer:has(ytd-rich-shelf-renderer[is-shorts]),
-#ytt-floating-btn:hover {
-    color: #fff !important;
-}
-
-/* Custom Player Tooltip */
-.ytt-player-tooltip {
-    position: fixed;
-    background: rgba(28, 28, 28, 0.9);
-    color: #fff;
-    padding: 5px 10px;
-    border-radius: 2px;
-    font-size: 12px;
-    font-weight: 500;
-    pointer-events: none;
-    z-index: 2147483647;
-    white-space: nowrap;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.5);
-    transform: translateX(-50%);
-    opacity: 0;
-    transition: opacity 0.1s ease;
-}
-
-.ytt-player-tooltip.visible {
-    opacity: 1;
-}
-/* Hiding Shorts in Search Results */
-ytd-reel-shelf-renderer,
-ytd-shelf-renderer:has(ytd-reel-shelf-renderer),
-ytd-rich-section-renderer:has(ytd-rich-shelf-renderer[is-shorts]),
-ytd-item-section-renderer:has(ytd-reel-shelf-renderer),
-ytd-item-section-renderer.ytGridShelfViewModelHost:has(a[href*="/shorts/"]),
-ytd-shelf-renderer[is-shorts],
-ytd-rich-shelf-renderer[is-shorts],
-ytd-shelf-renderer:has(yt-icon[type="shorts"]),
-ytd-rich-section-renderer:has(yt-icon[type="shorts"]),
-ytd-shelf-renderer:has(a[href*="/shorts/"]),
-ytd-rich-section-renderer:has(a[href*="/shorts/"]),
-ytd-rich-shelf-renderer:has(a[href*="/shorts/"]) {
+ytd-rich-section-renderer:has(ytd-rich-shelf-renderer[is-shorts]) {
     display: none !important;
 }
-/* Hiding individual Shorts videos */
+/* Hiding Shorts-only shelves (search results, channel pages, watch sidebar).
+   These renderers contain Shorts and nothing else, so removing the whole
+   shelf is safe — unlike their parent section, which holds normal videos. */
+ytd-reel-shelf-renderer,
+ytd-shelf-renderer[is-shorts],
+ytd-rich-shelf-renderer[is-shorts],
+ytd-shelf-renderer:has(ytd-reel-shelf-renderer),
+grid-shelf-view-model:has(ytm-shorts-lockup-view-model),
+grid-shelf-view-model:has(ytm-shorts-lockup-view-model-v2),
+.ytGridShelfViewModelHost:has(a[href*="/shorts/"]) {
+    display: none !important;
+}
+/* Hiding individual Shorts videos (leaving their siblings visible) */
 ytd-video-renderer:has(a[href*="/shorts/"]),
 ytd-grid-video-renderer:has(a[href*="/shorts/"]),
 ytd-rich-item-renderer:has(a[href*="/shorts/"]),
-ytd-reel-item-renderer,
-ytd-compact-video-renderer:has(a[href*="/shorts/"]) {
+ytd-compact-video-renderer:has(a[href*="/shorts/"]),
+yt-lockup-view-model:has(a[href*="/shorts/"]),
+ytm-shorts-lockup-view-model,
+ytm-shorts-lockup-view-model-v2,
+ytd-reel-item-renderer {
     display: none !important;
 }
 /* Hiding Shorts Section in Navigation Drawer */
@@ -65,10 +47,13 @@ ytd-guide-section-renderer:has(a[href*="/shorts"]),
 ytd-guide-entry-renderer:has(a[href*="/shorts"]) {
     display: none !important;
 }
-/* Hiding Shorts Tab on Channel Pages */
+/* Hiding Shorts Tab on Channel Pages / filter chips.
+   Scoped to tab elements — a bare a[href*="/shorts/"] rule would strip links
+   out of otherwise-legitimate results. */
 yt-tab-shape[tab-title="Shorts"],
+tp-yt-paper-tab:has(a[href*="/shorts"]),
 .yt-tab-shape-wiz__tab[aria-label="Shorts"],
-a[href*="/shorts/"] {
+yt-chip-cloud-chip-renderer:has(a[href*="/shorts"]) {
     display: none !important;
 }
 /* Specific fix for sidebar links that might have escaped */

@@ -1,4 +1,4 @@
-/* Unified Styles Bundle — Built at: 2026-08-11T12:25:05.990Z */
+/* Unified Styles Bundle — Built at: 2026-08-12T03:44:08.074Z */
 
 /* ─── src/shared/theme.css ─── */
 /* === Theme Variables === */
@@ -3437,6 +3437,10 @@ body.yt-shorts-resizing-active {
 
 .ytt-player-tooltip.visible {
   opacity: 1;
+}
+
+#ytt-floating-btn:hover {
+  color: #fff !important;
 }
 
 

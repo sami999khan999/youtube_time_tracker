@@ -826,3 +826,7 @@
 .ytt-player-tooltip.visible {
   opacity: 1;
 }
+
+#ytt-floating-btn:hover {
+  color: #fff !important;
+}
