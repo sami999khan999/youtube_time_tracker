@@ -306,6 +306,20 @@ function getSidebarHTML() {
                         <div class="settings-item">
                             <div class="settings-item-info">
                                 <div class="label-with-icon">
+                                    <span class="item-icon">${icons.focus || ""}</span>
+                                    <span class="settings-item-label">Focus Mode</span>
+                                    ${shortcutBadge("toggleFocusMode")}
+                                </div>
+                                <span class="settings-item-desc">Hide everything but the video — navbar, details, comments and suggestions</span>
+                            </div>
+                            <label class="toggle-switch">
+                                <input type="checkbox" id="focus-mode-toggle" ${focusModeSettings.enabled ? "checked" : ""}>
+                                <span class="toggle-slider"></span>
+                            </label>
+                        </div>
+                        <div class="settings-item">
+                            <div class="settings-item-info">
+                                <div class="label-with-icon">
                                     <span class="item-icon">${icons.expand || ""}</span>
                                     <span class="settings-item-label">Floating Video</span>
                                     ${shortcutBadge("toggleFloating")}

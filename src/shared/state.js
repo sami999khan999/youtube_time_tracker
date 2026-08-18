@@ -42,12 +42,16 @@ let smartFullscreenSettings = {
 let hideSuggestionsSettings = {
   enabled: false,
 };
+let focusModeSettings = {
+  enabled: false,
+};
 let keybindSettings = {
   toggleSidebar: "Alt+S",
   toggleFloating: "Alt+F",
   toggleDislike: "Alt+D",
   toggleShorts: "Alt+B",
   toggleSuggestions: "Alt+H",
+  toggleFocusMode: "Alt+Z",
   navHistory: "Alt+Q",
   navAnalytics: "Alt+W",
   navChannels: "Alt+E",
@@ -109,6 +113,7 @@ async function initState() {
         "ytt_retention_settings",
         "ytt_smart_fullscreen_settings",
         "ytt_suggestions_settings",
+        "ytt_focus_settings",
         "ytt_keybind_settings",
         "ytt_opacity_settings",
         "ytt_migrated",
@@ -214,6 +219,12 @@ async function initState() {
           hideSuggestionsSettings = {
             ...hideSuggestionsSettings,
             ...data.ytt_suggestions_settings,
+          };
+        }
+        if (data.ytt_focus_settings) {
+          focusModeSettings = {
+            ...focusModeSettings,
+            ...data.ytt_focus_settings,
           };
         }
         if (data.ytt_keybind_settings) {
@@ -477,6 +488,15 @@ function saveSuggestionsSettings() {
   writeVisualFastPath();
 }
 
+function saveFocusModeSettings() {
+  safeSendMessage({
+    action: "SAVE_SETTINGS",
+    type: "focus",
+    settings: focusModeSettings,
+  });
+  writeVisualFastPath();
+}
+
 function saveBackupSettings() {
   safeSendMessage({
     action: "SAVE_SETTINGS",
@@ -514,6 +534,10 @@ function writeVisualFastPath() {
     localStorage.setItem(
       "ytt_shorts_fast_path",
       JSON.stringify(shortsBlockerSettings),
+    );
+    localStorage.setItem(
+      "ytt_focus_fast_path",
+      JSON.stringify(focusModeSettings),
     );
   } catch (e) {}
 }
@@ -597,6 +621,15 @@ storage.onChanged.addListener((changes, area) => {
           ...(changes.ytt_suggestions_settings.newValue || {}),
         };
         if (typeof applyHideSuggestionsState === "function") applyHideSuggestionsState();
+        needsUIRefresh = true;
+        visualChanged = true;
+      }
+      if (changes.ytt_focus_settings) {
+        focusModeSettings = {
+          ...{ enabled: false },
+          ...(changes.ytt_focus_settings.newValue || {}),
+        };
+        if (typeof applyFocusModeState === "function") applyFocusModeState();
         needsUIRefresh = true;
         visualChanged = true;
       }

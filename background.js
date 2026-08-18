@@ -31,12 +31,14 @@ let dislikeCountSettings = { enabled: true };
 let opacitySettings = { enabled: false, value: 0.5 };
 let smartFullscreenSettings = { enabled: true };
 let hideSuggestionsSettings = { enabled: false };
+let focusModeSettings = { enabled: false };
 let keybindSettings = {
   toggleSidebar: "Alt+S",
   toggleFloating: "Alt+F",
   toggleDislike: "Alt+D",
   toggleShorts: "Alt+B",
   toggleSuggestions: "Alt+H",
+  toggleFocusMode: "Alt+Z",
   navHistory: "Alt+Q",
   navAnalytics: "Alt+W",
   navChannels: "Alt+E",
@@ -67,6 +69,7 @@ const loadPromise = new Promise((resolve) => {
       "ytt_opacity_settings",
       "ytt_smart_fullscreen_settings",
       "ytt_suggestions_settings",
+      "ytt_focus_settings",
       "ytt_keybind_settings",
     ],
     (data) => {
@@ -85,6 +88,8 @@ const loadPromise = new Promise((resolve) => {
         };
       if (data.ytt_suggestions_settings)
         hideSuggestionsSettings = { ...hideSuggestionsSettings, ...data.ytt_suggestions_settings };
+      if (data.ytt_focus_settings)
+        focusModeSettings = { ...focusModeSettings, ...data.ytt_focus_settings };
 
       // Watch for storage changes to keep background memory in sync with UI
       chrome.storage.onChanged.addListener((changes, area) => {
@@ -110,6 +115,8 @@ const loadPromise = new Promise((resolve) => {
           keybindSettings = changes.ytt_keybind_settings.newValue;
         if (changes.ytt_suggestions_settings)
           hideSuggestionsSettings = changes.ytt_suggestions_settings.newValue;
+        if (changes.ytt_focus_settings)
+          focusModeSettings = changes.ytt_focus_settings.newValue;
       });
 
       // Enforce retention policy on load
@@ -573,6 +580,7 @@ function saveHistoryNow() {
       opacitySettings,
       smartFullscreenSettings,
       hideSuggestionsSettings,
+      focusModeSettings,
       keybindSettings
   };
   broadcastFailsafeSync(liveBackup);
@@ -604,6 +612,9 @@ function handleSettingsUpdate(data) {
   } else if (data.type === "suggestions") {
     hideSuggestionsSettings = data.settings;
     storage.local.set({ ytt_suggestions_settings: hideSuggestionsSettings });
+  } else if (data.type === "focus") {
+    focusModeSettings = data.settings;
+    storage.local.set({ ytt_focus_settings: focusModeSettings });
   }
 }
 
@@ -701,6 +712,8 @@ async function createBackup() {
         "ytt_dislike_settings",
         "ytt_opacity_settings",
         "ytt_smart_fullscreen_settings",
+        "ytt_suggestions_settings",
+        "ytt_focus_settings",
         "ytt_keybind_settings",
       ],
       (res) => resolve(res),
@@ -719,6 +732,9 @@ async function createBackup() {
     opacitySettings: storageData.ytt_opacity_settings || opacitySettings,
     smartFullscreenSettings:
       storageData.ytt_smart_fullscreen_settings || smartFullscreenSettings,
+    hideSuggestionsSettings:
+      storageData.ytt_suggestions_settings || hideSuggestionsSettings,
+    focusModeSettings: storageData.ytt_focus_settings || focusModeSettings,
     keybindSettings: storageData.ytt_keybind_settings || keybindSettings,
   };
   try {
@@ -788,8 +804,20 @@ async function handleImportBackup(data) {
       data.ytt_opacity_settings || { enabled: false, value: 0.5 };
     smartFullscreenSettings = data.smartFullscreenSettings ||
       data.ytt_smart_fullscreen_settings || { enabled: true };
-    keybindSettings = data.keybindSettings ||
-      data.ytt_keybind_settings || keybindSettings;
+    hideSuggestionsSettings = data.hideSuggestionsSettings ||
+      data.ytt_suggestions_settings || { enabled: false };
+    focusModeSettings = data.focusModeSettings ||
+      data.ytt_focus_settings || { enabled: false };
+    // Merged, not replaced. A backup only carries the keybinds that existed
+    // when it was taken, so restoring an older one used to silently delete
+    // every shortcut added since — the action would then render as "None" in
+    // the hotkeys page and its key would stop working. Spreading the current
+    // (defaults-merged) map underneath keeps newer actions on their default
+    // bind while the backup still wins for anything it does define.
+    keybindSettings = {
+      ...keybindSettings,
+      ...(data.keybindSettings || data.ytt_keybind_settings || {}),
+    };
 
     // Save to storage
     const saveObj = {
@@ -801,6 +829,8 @@ async function handleImportBackup(data) {
       ytt_dislike_settings: dislikeCountSettings,
       ytt_opacity_settings: opacitySettings,
       ytt_smart_fullscreen_settings: smartFullscreenSettings,
+      ytt_suggestions_settings: hideSuggestionsSettings,
+      ytt_focus_settings: focusModeSettings,
       ytt_keybind_settings: keybindSettings,
     };
 
@@ -827,6 +857,8 @@ async function handleImportBackup(data) {
         ytt_dislike_settings: dislikeCountSettings,
         ytt_opacity_settings: opacitySettings,
         ytt_smart_fullscreen_settings: smartFullscreenSettings,
+        ytt_suggestions_settings: hideSuggestionsSettings,
+        ytt_focus_settings: focusModeSettings,
         ytt_keybind_settings: keybindSettings,
       },
     };

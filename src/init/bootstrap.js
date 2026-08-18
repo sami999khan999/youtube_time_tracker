@@ -9,6 +9,7 @@
     applyDislikeCountState();
     applyOpacityState();
     if (typeof applyHideSuggestionsState === 'function') applyHideSuggestionsState();
+    if (typeof applyFocusModeState === 'function') applyFocusModeState();
     injectStatsUI();
     setupFullscreenAutoHide();
     if (typeof setupSmartFullscreen === 'function') setupSmartFullscreen();
@@ -61,6 +62,10 @@
         updateStats(lastVideoId, true);
         // Clear dislike state for the upcoming video
         if (typeof resetDislikeState === 'function') resetDislikeState();
+        // Drop focus mode as soon as we leave a watch page, rather than waiting
+        // for yt-navigate-finish — otherwise the feed renders for a beat with
+        // the masthead still hidden.
+        if (typeof applyFocusModeState === 'function') applyFocusModeState();
     });
 
     window.addEventListener('yt-page-data-updated', () => {
@@ -68,6 +73,7 @@
         applyDislikeCountState();
         applyOpacityState();
         if (typeof applyHideSuggestionsState === 'function') applyHideSuggestionsState();
+        if (typeof applyFocusModeState === 'function') applyFocusModeState();
         injectStatsUI();
         if (typeof applyFloatingPlayerState === 'function') applyFloatingPlayerState();
     });
@@ -76,6 +82,7 @@
         applyDislikeCountState();
         applyOpacityState();
         if (typeof applyHideSuggestionsState === 'function') applyHideSuggestionsState();
+        if (typeof applyFocusModeState === 'function') applyFocusModeState();
         injectStatsUI();
         if (typeof applyFloatingPlayerState === 'function') applyFloatingPlayerState();
     });
