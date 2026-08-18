@@ -1,4 +1,4 @@
-/* Unified Styles Bundle — Built at: 2026-08-18T14:26:30.575Z */
+/* Unified Styles Bundle — Built at: 2026-08-18T14:30:44.733Z */
 
 /* ─── src/shared/theme.css ─── */
 /* === Theme Variables === */
@@ -3553,30 +3553,22 @@ html[data-ytt-focus] ytd-banner-promo-renderer {
   display: none !important;
 }
 
-/* ─── 2. Reclaim the space the hidden chrome reserved ─────────────────────── */
-
-/* YouTube offsets the page manager by the masthead height and the watch layout
-   by the mini-guide width. With both hidden those reservations would otherwise
-   leave a dead band of empty page above and to the left of the player. These
-   only move the player; they never change its size. */
-html[data-ytt-focus] ytd-app {
-  --ytd-masthead-height: 0px !important;
-  --ytd-mini-guide-width: 0px !important;
-}
-
-html[data-ytt-focus] ytd-page-manager,
-html[data-ytt-focus] ytd-watch-flexy {
-  margin-top: 0 !important;
-  padding-top: 0 !important;
-}
-
-/* Nothing is left to scroll to once the description and comments are gone. The
-   page background is deliberately left alone so the surround keeps whatever
-   YouTube theme the user is on. */
-html[data-ytt-focus],
-html[data-ytt-focus] body {
-  overflow: hidden !important;
-}
+/* ─── 2. The space the hidden chrome reserved is deliberately NOT reclaimed ──
+ *
+ * YouTube offsets the page manager by the masthead height and the watch layout
+ * by the mini-guide width. Those offsets are left in place on purpose, so the
+ * player stays at exactly the coordinates it already occupied — the masthead
+ * simply vanishes and leaves an empty band behind it.
+ *
+ * An earlier version zeroed --ytd-masthead-height / --ytd-mini-guide-width and
+ * the page-manager margins to close that gap. Do not reintroduce it: it made
+ * the video jump upwards the instant the bar disappeared, which is exactly the
+ * kind of movement this mode is supposed to avoid. A little empty space costs
+ * nothing; a moving video defeats the point.
+ *
+ * The page background and overflow are untouched for the same reason — both
+ * would shift or restyle the surround the user asked us to leave alone.
+ */
 
 /* ─── 3. The player itself is deliberately untouched ─────────────────────────
  *
