@@ -9,6 +9,11 @@
  * YouTube never rebuilds — so the stripped-down layout is in place on the very
  * first frame of a hard reload and survives SPA navigation untouched.
  *
+ * Nothing here resizes or repositions the player. Focus Mode hides the page
+ * around the video; the video itself keeps the size YouTube gave it. That is
+ * why this module dispatches no synthetic resize — doing so would invite the
+ * player to remeasure and change the frame the user asked us to leave alone.
+ *
  * Mirrors the page-dimmer fast path in shared/state.js.
  */
 
@@ -49,27 +54,6 @@ function applyFocusModeState() {
   } else {
     root.removeAttribute(FOCUS_MODE_ATTR);
   }
-
-  nudgePlayerLayout();
-}
-
-/**
- * YouTube's player writes inline width/height onto the <video> element and its
- * control bar from JS, sized to whatever layout was active when it last
- * measured. Resizing the player through CSS alone therefore leaves the
- * controls laid out for the old width until something triggers a remeasure —
- * and a window resize is the event the player already listens for.
- *
- * The CSS overrides the video box directly too, so the frame itself is correct
- * even if this never lands; this is what realigns the progress bar and the
- * rest of the player chrome.
- */
-function nudgePlayerLayout() {
-  requestAnimationFrame(() => {
-    try {
-      window.dispatchEvent(new Event("resize"));
-    } catch (e) {}
-  });
 }
 
 // === ZERO-LATENCY FAST PATH: enter focus mode before first paint ===
