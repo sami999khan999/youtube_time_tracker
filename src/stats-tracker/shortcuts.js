@@ -110,6 +110,12 @@ window.initShortcuts = function() {
                 saveSuggestionsSettings();
             }
         }
+        else if (matchesKeybind(e, keybindSettings.toggleFocusMode)) {
+            console.log("YTT: [Match] toggleFocusMode triggered");
+            e.preventDefault();
+            e.stopImmediatePropagation();
+            toggleFocusMode();
+        }
         else if (matchesKeybind(e, keybindSettings.toggleOpacity)) {
             console.log("YTT: [Match] toggleOpacity triggered");
             e.preventDefault();
@@ -221,6 +227,45 @@ function adjustOpacityLevel(delta) {
             message: `YouTube visibility set to ${Math.round(next * 100)}%`,
             icon: OPACITY_TOAST_ICON,
             duration: 1400,
+        });
+    }
+}
+
+// Crop-marks glyph for the focus-mode toast, matching the app's icon style
+const FOCUS_TOAST_ICON = `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 7V5a2 2 0 0 1 2-2h2"></path><path d="M17 3h2a2 2 0 0 1 2 2v2"></path><path d="M21 17v2a2 2 0 0 1-2 2h-2"></path><path d="M7 21H5a2 2 0 0 1-2-2v-2"></path><rect x="7" y="8" width="10" height="8" rx="1.5"></rect></svg>`;
+
+/**
+ * Toggles Focus Mode — everything except the video itself.
+ *
+ * Always surfaces a toast, and the toast always names the key that undoes it:
+ * turning this on hides the masthead and every YouTube control, so a user who
+ * triggered it by accident has nothing left on the page to tell them how to
+ * get back. (The extension's own toggle button stays visible as a second way
+ * out, but it isn't self-explanatory.)
+ */
+function toggleFocusMode() {
+    if (typeof focusModeSettings === 'undefined') return;
+
+    const bind = (typeof keybindSettings !== 'undefined' && keybindSettings.toggleFocusMode) || 'the focus shortcut';
+
+    // Focus mode only applies on a watch page. Toggling it elsewhere would
+    // silently do nothing, so say so instead of leaving the user guessing.
+    const onWatchPage = window.location.pathname === '/watch';
+
+    focusModeSettings.enabled = !focusModeSettings.enabled;
+    if (typeof applyFocusModeState === 'function') applyFocusModeState();
+    if (typeof syncSettingsUI === 'function') syncSettingsUI();
+    if (typeof saveFocusModeSettings === 'function') saveFocusModeSettings();
+
+    if (typeof window.showActionToast === 'function') {
+        const enabled = focusModeSettings.enabled;
+        window.showActionToast({
+            eyebrow: 'Focus Mode',
+            message: !onWatchPage
+                ? (enabled ? `On — applies once you open a video` : `Off`)
+                : (enabled ? `Video only — press ${bind} to exit` : `Page restored`),
+            icon: FOCUS_TOAST_ICON,
+            duration: enabled ? 2600 : 1400,
         });
     }
 }

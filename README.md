@@ -31,12 +31,18 @@ A premium, accessibility-first Chrome extension designed to help you take contro
 - **Manual Import/Export**: Export your data to JSON for safe-keeping or migration across devices.
 - **Double-Counting Protection**: Intelligent background sync ensures that "Time on YouTube" reflects real clock time, even with 10+ tabs open at once.
 
-### 6. Premium UI/UX
+### 6. Focus Mode
+- **Video Only**: Strips a watch page down to the player alone — no masthead, no guide rail, no title or description, no comments, no suggestions.
+- **Zero-Flicker**: Applied from a cached fast path at `document_start`, so a hard reload never flashes the page chrome in before hiding it.
+- **Watch Pages Only**: Automatically lifts when you navigate back to a feed, so you are never left without a way to navigate.
+- **One Key Out**: `Alt+Z` toggles it, and the confirmation toast names the key that undoes it.
+
+### 7. Premium UI/UX
 - **Native Aesthetic**: A theme-aware interface with glassmorphism effects that blends perfectly with YouTube's styles.
 - **Total Scroll Management**: Automatically hides the YouTube scrollbar and locks page scrolling when the sidebar or modals are active.
 - **Draggable & Resizable**: Move the toggle button anywhere and pull the sidebar width to suit your workspace (300px to 800px).
 
-### 7. Customizable Hotkeys & Shortcuts
+### 8. Customizable Hotkeys & Shortcuts
 - **Full Keyboard Control**: Instantly open views, toggle features, and adjust page dimming with fast keyboard shortcuts.
 - **Interactive Remapping**: Click any shortcut in the extension settings to remap it to your preferred key combo.
 
@@ -127,6 +133,11 @@ YouTube Time Tracker includes custom global and in-page hotkeys for rapid naviga
       <td><b>Hide Suggestions</b></td>
       <td align="center"><code>Alt + H</code></td>
       <td>Toggle hiding YouTube recommended videos feed</td>
+    </tr>
+    <tr>
+      <td><b>Focus Mode</b></td>
+      <td align="center"><code>Alt + Z</code></td>
+      <td>Hide everything but the video — navbar, details, comments and suggestions</td>
     </tr>
     <tr>
       <td><b>Toggle Base Opacity</b></td>

@@ -47,6 +47,9 @@ function syncSettingsUI() {
   if (suggestionsToggle)
     suggestionsToggle.checked = hideSuggestionsSettings.enabled;
 
+  const focusToggle = document.getElementById("focus-mode-toggle");
+  if (focusToggle) focusToggle.checked = focusModeSettings.enabled;
+
   const opacityToggle = document.getElementById("opacity-enabled-toggle");
   if (opacityToggle) opacityToggle.checked = opacitySettings.enabled;
 
@@ -632,6 +635,7 @@ function bindSidebarEvents(sidebar, btn, dragStatus) {
             toggleDislike: "Alt+D",
             toggleShorts: "Alt+B",
             toggleSuggestions: "Alt+H",
+            toggleFocusMode: "Alt+Z",
             navHistory: "Alt+Q",
             navAnalytics: "Alt+W",
             navChannels: "Alt+E",
@@ -818,6 +822,16 @@ function bindSidebarEvents(sidebar, btn, dragStatus) {
       hideSuggestionsSettings.enabled = suggestionsToggle.checked;
       saveSuggestionsSettings();
       if (typeof applyHideSuggestionsState === "function") applyHideSuggestionsState();
+    };
+  }
+
+  const focusModeToggle = document.getElementById("focus-mode-toggle");
+  if (focusModeToggle) {
+    focusModeToggle.onchange = (e) => {
+      e.stopPropagation();
+      focusModeSettings.enabled = focusModeToggle.checked;
+      saveFocusModeSettings();
+      if (typeof applyFocusModeState === "function") applyFocusModeState();
     };
   }
 
@@ -1694,6 +1708,7 @@ function renderKeybinds() {
         { id: "toggleDislike", label: "Dislike Counter", desc: "Toggle visibility of the dislike count", icon: icons.dislike },
         { id: "toggleShorts", label: "Shorts Blocker", desc: "Instantly enable/disable the shorts filter", icon: icons.close },
         { id: "toggleSuggestions", label: "Hide Suggestions", desc: "Remove the suggestions sidebar and center", icon: icons.eye_off || icons.eye },
+        { id: "toggleFocusMode", label: "Focus Mode", desc: "Hide everything but the video on a watch page", icon: icons.focus },
         { id: "toggleOpacity", label: "Toggle Opacity", desc: "Dim/undim the YouTube background", icon: icons.eye },
         { id: "opacityUp", label: "Opacity Up", desc: "Make the YouTube page brighter (less dim)", icon: icons.eye },
         { id: "opacityDown", label: "Opacity Down", desc: "Make the YouTube page darker (more dim)", icon: icons.eye_off || icons.eye },

@@ -24,6 +24,7 @@ const JS_FILES = [
     'shared/db.js',
     'shared/dropdown.js',
     'shared/suggestions.js',
+    'shared/focus-mode.js',
 
     // 2. Shorts Blocker domain
     'shorts-blocker/blocker.js',
@@ -93,6 +94,7 @@ const CSS_FILES = [
     'src/stats-tracker/charts.css',
     'src/settings/settings.css',
     'src/settings/opacity.css',
+    'src/settings/focus-mode.css',
     'src/break-reminder/break-modal.css',
     'src/init/responsive.css'
 ];

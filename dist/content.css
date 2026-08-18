@@ -1,4 +1,4 @@
-/* Unified Styles Bundle — Built at: 2026-08-12T03:44:08.074Z */
+/* Unified Styles Bundle — Built at: 2026-08-18T13:58:03.806Z */
 
 /* ─── src/shared/theme.css ─── */
 /* === Theme Variables === */
@@ -3489,6 +3489,155 @@ html[data-ytt-dim]::before {
  */
 html[data-ytt-dim] :fullscreen {
   filter: brightness(var(--ytt-dim-brightness, 1)) !important;
+}
+
+
+/* ─── src/settings/focus-mode.css ─── */
+/* ─── Focus Mode ────────────────────────────────────────────────────────────
+ *
+ * Strips a watch page down to the video and nothing else: no masthead, no
+ * guide rail, no metadata, no description, no comments, no suggestions.
+ *
+ * Ships inside dist/content.css, which the manifest declares as a
+ * document_start content-script stylesheet — so these rules are loaded before
+ * the page's first paint. Turning focus mode on is then a single attribute
+ * write on <html> (see applyFocusModeState in shared/focus-mode.js), an
+ * element that already exists at document_start and that YouTube never
+ * rebuilds. That is what keeps a hard reload from flashing the whole page
+ * chrome in before we hide it.
+ *
+ * Why the attribute is only set on /watch: focus mode is meaningless on the
+ * home feed, and hiding the masthead there would leave the user with no way to
+ * navigate. The gate lives in JS rather than CSS because `location.pathname`
+ * is readable synchronously at document_start, whereas the DOM markers that
+ * distinguish a watch page (ytd-watch-flexy) are not there yet.
+ *
+ * Nothing here touches the extension's own UI. The toggle button, sidebar and
+ * modals sit at z-index 2147483646+, far above the pinned player below, so the
+ * user always keeps a visible way back out even with every YouTube control
+ * hidden.
+ */
+
+/* ─── 1. Hide the page chrome ─────────────────────────────────────────────── */
+
+/* Top bar. #masthead-container is the sticky wrapper; ytd-masthead is the bar
+   itself. Both are listed because YouTube has shipped layouts where the
+   wrapper is absent. */
+html[data-ytt-focus] #masthead-container,
+html[data-ytt-focus] ytd-masthead,
+/* Left navigation — the full drawer and the collapsed icon rail. */
+html[data-ytt-focus] tp-yt-app-drawer#guide,
+html[data-ytt-focus] #guide,
+html[data-ytt-focus] ytd-mini-guide-renderer,
+html[data-ytt-focus] #mini-guide,
+/* Everything below the player: title, channel row, description, comments. */
+html[data-ytt-focus] ytd-watch-flexy #below,
+html[data-ytt-focus] ytd-watch-metadata,
+html[data-ytt-focus] ytd-comments,
+html[data-ytt-focus] #comments,
+/* Suggestions column and live chat. */
+html[data-ytt-focus] ytd-watch-flexy #secondary,
+html[data-ytt-focus] ytd-watch-flexy #secondary-inner,
+html[data-ytt-focus] ytd-watch-next-secondary-results-renderer,
+html[data-ytt-focus] ytd-live-chat-frame#chat,
+/* Merch / ticker / donation shelves that render as siblings of the player. */
+html[data-ytt-focus] ytd-merch-shelf-renderer,
+html[data-ytt-focus] ytd-donation-shelf-renderer,
+/* Miscellaneous page furniture. */
+html[data-ytt-focus] #footer,
+html[data-ytt-focus] ytd-watch-flexy #chips-wrapper,
+html[data-ytt-focus] tp-yt-paper-toast,
+html[data-ytt-focus] ytd-banner-promo-renderer {
+  display: none !important;
+}
+
+/* ─── 2. Reclaim the space the hidden chrome reserved ─────────────────────── */
+
+/* YouTube offsets the page manager by the masthead height and the watch layout
+   by the mini-guide width. With both hidden those reservations would leave a
+   band of empty page, which matters because the pinned player below is
+   letterboxed against it. */
+html[data-ytt-focus] ytd-app {
+  --ytd-masthead-height: 0px !important;
+  --ytd-mini-guide-width: 0px !important;
+}
+
+html[data-ytt-focus] ytd-page-manager,
+html[data-ytt-focus] ytd-watch-flexy {
+  margin-top: 0 !important;
+  padding-top: 0 !important;
+}
+
+/* Nothing is left to scroll to, and a stray scrollbar would sit on top of the
+   fixed player. */
+html[data-ytt-focus],
+html[data-ytt-focus] body {
+  overflow: hidden !important;
+  background: #000 !important;
+}
+
+/* ─── 3. Pin the player to the viewport ───────────────────────────────────── */
+
+/*
+ * #movie_player is the player root, and it is the same element in both the
+ * default and theater layouts (YouTube reparents it between
+ * #player-container-inner and #full-bleed-container), so pinning it covers
+ * both without having to know which container currently owns it.
+ *
+ * The ytd-app:not([fullscreen]) guard hands control back to the browser during
+ * native fullscreen: a fullscreened element is promoted to the top layer and
+ * sizes itself, so competing with it here would only cause it to fight our
+ * fixed positioning.
+ *
+ * z-index stays low deliberately. Every YouTube sibling that could overlap is
+ * already hidden above, and a high value here would bury the extension's own
+ * toggle button and sidebar — the user's way back out.
+ */
+html[data-ytt-focus] ytd-app:not([fullscreen]) #movie_player {
+  position: fixed !important;
+  inset: 0 !important;
+  width: 100vw !important;
+  height: 100vh !important;
+  max-width: 100vw !important;
+  max-height: 100vh !important;
+  z-index: 100 !important;
+  background: #000 !important;
+}
+
+/*
+ * YouTube's player writes inline width/height/left/top onto the <video> and
+ * its container from JS, sized to the old layout. applyFocusModeState fires a
+ * synthetic resize so the player recomputes — but these rules mean the frame
+ * is already correct before that lands, and stays correct even if a future
+ * player build stops honouring the resize event. object-fit keeps the aspect
+ * ratio, letterboxing against the black background rather than stretching.
+ */
+html[data-ytt-focus] ytd-app:not([fullscreen]) #movie_player .html5-video-container {
+  width: 100% !important;
+  height: 100% !important;
+  left: 0 !important;
+  top: 0 !important;
+}
+
+html[data-ytt-focus] ytd-app:not([fullscreen]) #movie_player video.html5-main-video {
+  width: 100% !important;
+  height: 100% !important;
+  left: 0 !important;
+  top: 0 !important;
+  object-fit: contain !important;
+}
+
+/* The player's own containers must not clip the pinned player or re-impose the
+   16:9 box they were sized to. */
+html[data-ytt-focus] ytd-app:not([fullscreen]) #player-container-outer,
+html[data-ytt-focus] ytd-app:not([fullscreen]) #player-container-inner,
+html[data-ytt-focus] ytd-app:not([fullscreen]) #player-container,
+html[data-ytt-focus] ytd-app:not([fullscreen]) ytd-watch-flexy #player {
+  max-width: none !important;
+  max-height: none !important;
+  padding: 0 !important;
+  margin: 0 !important;
+  overflow: visible !important;
 }
 
 
