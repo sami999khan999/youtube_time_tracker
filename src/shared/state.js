@@ -704,8 +704,11 @@ function applyOpacityState(options) {
     return;
   }
 
-  // Clamp: a stored value outside 0–1 would blank the page out entirely.
-  const value = Math.min(Math.max(Number(opacitySettings.value) || 0, 0.05), 1);
+  // Clamp to 0–1. 0 is a legitimate setting (fully black), so a non-numeric
+  // value — an interrupted write, an older backup — must not fall through to
+  // 0 and black the page out; it falls back to the default instead.
+  const raw = Number(opacitySettings.value);
+  const value = Math.min(Math.max(Number.isFinite(raw) ? raw : 0.5, 0), 1);
 
   // The overlay is black at (1 - value) alpha, which renders identically to
   // the content itself at `value` opacity over black.

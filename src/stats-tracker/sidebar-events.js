@@ -879,7 +879,7 @@ function bindSidebarEvents(sidebar, btn, dragStatus) {
         if (e.key === "ArrowRight") {
           opacitySlider.value = Math.min(1, current + step);
         } else {
-          opacitySlider.value = Math.max(0.05, current - step);
+          opacitySlider.value = Math.max(0, current - step);
         }
         // Trigger input event to update UI and state
         opacitySlider.dispatchEvent(new Event('input', { bubbles: true }));
