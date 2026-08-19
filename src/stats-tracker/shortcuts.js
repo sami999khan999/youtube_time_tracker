@@ -128,15 +128,19 @@ window.initShortcuts = function() {
             }
         }
         else if (matchesKeybind(e, keybindSettings.opacityUp)) {
-            console.log("YTT: [Match] opacityUp triggered");
             e.preventDefault();
             e.stopImmediatePropagation();
+            // Held keys auto-repeat, which would run the whole 0–100% range
+            // past the user in under a second. One press = one 5% step.
+            if (e.repeat) return;
+            console.log("YTT: [Match] opacityUp triggered");
             adjustOpacityLevel(0.05);
         }
         else if (matchesKeybind(e, keybindSettings.opacityDown)) {
-            console.log("YTT: [Match] opacityDown triggered");
             e.preventDefault();
             e.stopImmediatePropagation();
+            if (e.repeat) return;
+            console.log("YTT: [Match] opacityDown triggered");
             adjustOpacityLevel(-0.05);
         }
         // New Navigation and System Shortcuts
@@ -200,8 +204,8 @@ const OPACITY_TOAST_ICON = `<svg width="18" height="18" viewBox="0 0 24 24" fill
 
 /**
  * Nudges the "Dim YouTube Base" opacity level up or down via keyboard.
- * Auto-enables the feature so the change is immediately visible, clamps to a
- * safe 0.05–1.0 range, syncs the settings UI, and surfaces a brief toast.
+ * Auto-enables the feature so the change is immediately visible, clamps to
+ * 0–1.0, syncs the settings UI, and surfaces a brief toast.
  */
 function adjustOpacityLevel(delta) {
     if (typeof opacitySettings === 'undefined') return;
@@ -213,8 +217,10 @@ function adjustOpacityLevel(delta) {
     // Snap to the 5% grid the slider uses, so a legacy value like 0.42 lands on
     // 0.45 / 0.40 rather than carrying its offset forward forever.
     let next = Math.round((current + delta) * 20) / 20;
-    // Clamp to 0.05–1.0 so the page never fully disappears
-    next = Math.min(1, Math.max(0.05, next));
+    // Clamp to 0–1.0. 0 blacks the page out completely, which is the point;
+    // the sidebar, toggle button and toasts all paint above the dimmer, so
+    // there is always something left to undo it with.
+    next = Math.min(1, Math.max(0, next));
     opacitySettings.value = next;
 
     if (typeof applyOpacityState === 'function') applyOpacityState();
