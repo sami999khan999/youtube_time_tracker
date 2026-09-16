@@ -117,20 +117,11 @@ ytd-segmented-like-dislike-button-renderer {
     overflow: visible !important;
 }
 
-/* After we swap the dislike button from icon-only to icon+text, let it size
-   itself to the icon + count and keep the two packed together at the start of
-   the button. The spacing itself (paddings and the icon/count gap) is measured
-   off the like button at render time and applied inline, so the two halves of
-   the segmented pill always match — see applyDislikeButtonMetrics(). */
-button.yt-spec-button-shape-next[data-ytt-class-swapped] {
-    width: auto !important;
-    min-width: 0 !important;
-    justify-content: flex-start !important;
-}
-button.yt-spec-button-shape-next[data-ytt-class-swapped]
-    .yt-spec-button-shape-next__button-text-content[data-ytt-dislike] {
-    flex: 0 0 auto !important;
-}
+/* The dislike count is positioned entirely by YouTube's own icon+text rules --
+   we clear the slot's `is-empty` attribute and swap the button's shape class,
+   and YouTube does the rest. Deliberately no padding/margin overrides here:
+   every previous attempt to place the number by hand drifted out of step with
+   the like button. See ensureDislikeTextSlot() in dislike-counter.js. */
 
 /* Adjustments for Shorts */
 ytd-reel-video-renderer .ytt-dislike-count-container {
