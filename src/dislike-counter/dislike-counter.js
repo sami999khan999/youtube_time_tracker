@@ -127,7 +127,8 @@ function getButtonParts(button) {
     const root = button.shadowRoot || button;
     return {
         icon: root.querySelector(".yt-spec-button-shape-next__icon"),
-        text: root.querySelector(".yt-spec-button-shape-next__button-text-content"),
+        text: root.querySelector(".yt-spec-button-shape-next__button-text-content")
+            || root.querySelector(".yt-core-attributed-string"),
     };
 }
 
@@ -175,12 +176,22 @@ function applyDislikeButtonMetrics(dislikeBtn, likeBtn) {
     const parts = getButtonParts(dislikeBtn);
     if (!parts) return;
 
-    const m = measureLikeButtonMetrics(likeBtn) || DISLIKE_METRICS_FALLBACK;
+    const measured = measureLikeButtonMetrics(likeBtn);
+    if (!measured) {
+        console.log("YTT: [Dislike] Could not measure the like button; using fallback spacing.");
+    }
+    const m = measured || DISLIKE_METRICS_FALLBACK;
 
     // Inline "important" outranks the stylesheet's own !important rules, which
     // is what lets these values win over YouTube's icon-leading defaults.
-    dislikeBtn.style.setProperty("padding-left", m.iconSideGap + "px", "important");
-    dislikeBtn.style.setProperty("padding-right", m.textSideGap + "px", "important");
+    // Mirror, don't copy. On the like button the rounded edge is on the left and
+    // the flat edge at the divider is on the right; the dislike button is the
+    // other way round. So its inner (left) padding takes the like button's
+    // divider-side gap and its outer (right) padding takes the rounded-side gap.
+    // Getting this backwards crowds the count against the curve and pushes the
+    // icon away from the divider.
+    dislikeBtn.style.setProperty("padding-left", m.textSideGap + "px", "important");
+    dislikeBtn.style.setProperty("padding-right", m.iconSideGap + "px", "important");
 
     if (parts.icon) {
         parts.icon.style.setProperty("margin-left", "0px", "important");
