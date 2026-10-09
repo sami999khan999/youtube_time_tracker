@@ -1,7 +1,7 @@
 /**
  * Build Script for YouTube Time Tracker
  * 
- * Concatenates all JS source files from src/ into dist/content.js
+ * Concatenates all JS source files from src/ into extension-build/content.js
  * in the correct dependency order.
  * 
  * Usage: node build.js
@@ -11,7 +11,7 @@ const fs = require('fs');
 const path = require('path');
 
 const SRC_DIR = path.join(__dirname, 'src');
-const DIST_DIR = path.join(__dirname, 'dist');
+const DIST_DIR = path.join(__dirname, 'extension-build');
 const OUTPUT_FILE = path.join(DIST_DIR, 'content.js');
 
 // Files in dependency order (later files can reference earlier ones)
@@ -54,7 +54,7 @@ const JS_FILES = [
     'init/bootstrap.js',
 ];
 
-// Ensure dist directory exists
+// Ensure extension-build directory exists
 if (!fs.existsSync(DIST_DIR)) {
     fs.mkdirSync(DIST_DIR, { recursive: true });
 }
@@ -80,7 +80,7 @@ for (const file of JS_FILES) {
 // --- (Previous logic for JS continues) ---
 
 fs.writeFileSync(OUTPUT_FILE, output, 'utf-8');
-console.log(`✅ Build complete: dist/content.js (${(fs.statSync(OUTPUT_FILE).size / 1024).toFixed(1)} KB)`);
+console.log(`✅ Build complete: extension-build/content.js (${(fs.statSync(OUTPUT_FILE).size / 1024).toFixed(1)} KB)`);
 
 // ─── CSS Bundle ───
 const CSS_OUTPUT = path.join(DIST_DIR, 'content.css');
@@ -113,7 +113,7 @@ for (const file of CSS_FILES) {
 }
 
 fs.writeFileSync(CSS_OUTPUT, cssOutput, 'utf-8');
-console.log(`✅ Build complete: dist/content.css (${(fs.statSync(CSS_OUTPUT).size / 1024).toFixed(1)} KB)`);
+console.log(`✅ Build complete: extension-build/content.css (${(fs.statSync(CSS_OUTPUT).size / 1024).toFixed(1)} KB)`);
 
 // ─── Background Bundle ───
 const BACKGROUND_OUTPUT = path.join(DIST_DIR, 'background.js');
@@ -138,7 +138,7 @@ for (const file of BACKGROUND_FILES) {
 }
 
 fs.writeFileSync(BACKGROUND_OUTPUT, bgOutput, 'utf-8');
-console.log(`✅ Build complete: dist/background.js (${(fs.statSync(BACKGROUND_OUTPUT).size / 1024).toFixed(1)} KB)`);
+console.log(`✅ Build complete: extension-build/background.js (${(fs.statSync(BACKGROUND_OUTPUT).size / 1024).toFixed(1)} KB)`);
 
 // Print summary details
 console.log(`\n📊 Source file line counts:`);

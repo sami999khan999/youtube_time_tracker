@@ -10,7 +10,7 @@
   },
   "permissions": ["storage", "webNavigation", "alarms", "unlimitedStorage"],
   "background": {
-    "service_worker": "dist/background.js"
+    "service_worker": "extension-build/background.js"
   },
   "host_permissions": [
     "*://*.youtube.com/*",
@@ -21,8 +21,8 @@
   "content_scripts": [
     {
       "matches": ["*://*.youtube.com/*"],
-      "css": ["dist/content.css"],
-      "js": ["dist/content.js"],
+      "css": ["extension-build/content.css"],
+      "js": ["extension-build/content.js"],
       "run_at": "document_start"
     }
   ],

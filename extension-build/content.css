@@ -1,4 +1,4 @@
-/* Unified Styles Bundle — Built at: 2026-09-16T04:29:21.804Z */
+/* Unified Styles Bundle — Built at: 2026-10-09T16:48:01.350Z */
 
 /* ─── src/shared/theme.css ─── */
 /* === Theme Variables === */
@@ -3431,7 +3431,7 @@ body.yt-shorts-resizing-active {
 /* ─── src/settings/opacity.css ─── */
 /* ─── Page Dimmer ───────────────────────────────────────────────────────────
  *
- * Ships inside dist/content.css, which the manifest declares as a
+ * Ships inside extension-build/content.css, which the manifest declares as a
  * document_start content-script stylesheet. The browser therefore has these
  * rules loaded BEFORE the page's first paint, with no JavaScript involved —
  * turning the dim on is just a matter of setting two properties on <html>
@@ -3482,7 +3482,7 @@ html[data-ytt-dim] :fullscreen {
  * Strips a watch page down to the video and nothing else: no masthead, no
  * guide rail, no metadata, no description, no comments, no suggestions.
  *
- * Ships inside dist/content.css, which the manifest declares as a
+ * Ships inside extension-build/content.css, which the manifest declares as a
  * document_start content-script stylesheet — so these rules are loaded before
  * the page's first paint. Turning focus mode on is then a single attribute
  * write on <html> (see applyFocusModeState in shared/focus-mode.js), an

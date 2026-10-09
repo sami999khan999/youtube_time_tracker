@@ -3,7 +3,7 @@
  * Strips a watch page down to the video and nothing else: no masthead, no
  * guide rail, no metadata, no description, no comments, no suggestions.
  *
- * Ships inside dist/content.css, which the manifest declares as a
+ * Ships inside extension-build/content.css, which the manifest declares as a
  * document_start content-script stylesheet — so these rules are loaded before
  * the page's first paint. Turning focus mode on is then a single attribute
  * write on <html> (see applyFocusModeState in shared/focus-mode.js), an

@@ -181,7 +181,7 @@ The project is built with a **Domain-Driven Design (DDD)** folder structure to e
 
 ### Optimization & Build
 To maintain speed and stability, the project uses a custom **`build.js`** environment:
-- Concatenates 17+ modular source files into optimized `dist/content.js` and `dist/background.js` bundles.
+- Concatenates 17+ modular source files into optimized `extension-build/content.js` and `extension-build/background.js` bundles.
 - Enforces a strict **300-line maintainability limit** across all source files.
 - Uses **ES6+ features** and leverages **Service Worker bundling** for maximum reliability in Manifest V3.
 

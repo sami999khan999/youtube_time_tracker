@@ -671,7 +671,7 @@ function saveSmartFullscreenSettings() {
  * Turns the page dimmer on/off.
  *
  * All the styling lives in settings/opacity.css, which ships inside
- * dist/content.css and is therefore loaded by the browser at document_start,
+ * extension-build/content.css and is therefore loaded by the browser at document_start,
  * before first paint. This function only has to flip two properties on <html>
  * — an element that already exists when a content script first runs and that
  * YouTube never rebuilds — so the dim is in place on the very first frame of a
@@ -726,7 +726,7 @@ try {
       opacitySettings = cached;
       // Two property writes on <html>, which already exists — nothing to wait
       // for, nothing to re-assert. The rules themselves came in with
-      // dist/content.css, so the dim is live from the first painted frame.
+      // extension-build/content.css, so the dim is live from the first painted frame.
       applyOpacityState();
     }
   }
