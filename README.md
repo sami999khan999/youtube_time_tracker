@@ -191,13 +191,13 @@ To maintain speed and stability, the project uses a custom **`build.js`** enviro
 
 1. Clone this repository or download the source code.
 2. Ensure you have [Node.js](https://nodejs.org/) installed.
-3. Run the optimized build script:
+3. Run the optimized build script (optional: `extension-build/` is committed, so a clone loads as is):
    ```bash
    node build.js
    ```
 4. Open Chrome and head to `chrome://extensions`.
 5. Enable **Developer mode** and "Load unpacked".
-6. Select the project root folder.
+6. Select the `extension-build/` folder (the whole extension: manifest, icons, bundles).
 
 ---
 

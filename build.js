@@ -11,6 +11,8 @@ const fs = require('fs');
 const path = require('path');
 
 const SRC_DIR = path.join(__dirname, 'src');
+// extension-build/ is the whole extension (manifest, icons, bundles): Load unpacked selects it.
+// It is committed, so any device can load it without building.
 const DIST_DIR = path.join(__dirname, 'extension-build');
 const OUTPUT_FILE = path.join(DIST_DIR, 'content.js');
 
@@ -139,6 +141,15 @@ for (const file of BACKGROUND_FILES) {
 
 fs.writeFileSync(BACKGROUND_OUTPUT, bgOutput, 'utf-8');
 console.log(`✅ Build complete: extension-build/background.js (${(fs.statSync(BACKGROUND_OUTPUT).size / 1024).toFixed(1)} KB)`);
+
+// ─── Manifest and icons ───
+// The manifest's paths are relative to extension-build/.
+fs.copyFileSync(path.join(SRC_DIR, 'manifest.json'), path.join(DIST_DIR, 'manifest.json'));
+fs.mkdirSync(path.join(DIST_DIR, 'icons'), { recursive: true });
+for (const icon of ['icon16.png', 'icon48.png', 'icon128.png']) {
+    fs.copyFileSync(path.join(__dirname, 'icons', icon), path.join(DIST_DIR, 'icons', icon));
+}
+console.log('✅ Copied: extension-build/manifest.json and icons/');
 
 // Print summary details
 console.log(`\n📊 Source file line counts:`);
