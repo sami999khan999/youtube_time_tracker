@@ -3,7 +3,7 @@
  * @description Focus Mode — reduces a watch page to the video alone.
  *
  * All the styling lives in settings/focus-mode.css, which ships inside
- * extension-build/content.css and is therefore loaded by the browser at document_start,
+ * release/content.css and is therefore loaded by the browser at document_start,
  * before first paint. This module only has to flip one attribute on <html> —
  * an element that already exists when a content script first runs and that
  * YouTube never rebuilds — so the stripped-down layout is in place on the very

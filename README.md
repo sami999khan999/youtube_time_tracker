@@ -181,7 +181,7 @@ The project is built with a **Domain-Driven Design (DDD)** folder structure to e
 
 ### Optimization & Build
 To maintain speed and stability, the project uses a custom **`build.js`** environment:
-- Concatenates 17+ modular source files into optimized `extension-build/content.js` and `extension-build/background.js` bundles.
+- Concatenates 17+ modular source files into optimized `release/content.js` and `release/background.js` bundles.
 - Enforces a strict **300-line maintainability limit** across all source files.
 - Uses **ES6+ features** and leverages **Service Worker bundling** for maximum reliability in Manifest V3.
 
@@ -191,13 +191,13 @@ To maintain speed and stability, the project uses a custom **`build.js`** enviro
 
 1. Clone this repository or download the source code.
 2. Ensure you have [Node.js](https://nodejs.org/) installed.
-3. Run the optimized build script (optional: `extension-build/` is committed, so a clone loads as is):
+3. Run the optimized build script (optional: `release/` is committed, so a clone loads as is):
    ```bash
    node build.js
    ```
 4. Open Chrome and head to `chrome://extensions`.
 5. Enable **Developer mode** and "Load unpacked".
-6. Select the `extension-build/` folder (the whole extension: manifest, icons, bundles).
+6. Select the `release/` folder (the whole extension: manifest, icons, bundles).
 
 ---
 

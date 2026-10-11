@@ -1,7 +1,7 @@
 /**
  * Build Script for YouTube Time Tracker
  * 
- * Concatenates all JS source files from src/ into extension-build/content.js
+ * Concatenates all JS source files from src/ into release/content.js
  * in the correct dependency order.
  * 
  * Usage: node build.js
@@ -11,9 +11,9 @@ const fs = require('fs');
 const path = require('path');
 
 const SRC_DIR = path.join(__dirname, 'src');
-// extension-build/ is the whole extension (manifest, icons, bundles): Load unpacked selects it.
+// release/ is the whole extension (manifest, icons, bundles): Load unpacked selects it.
 // It is committed, so any device can load it without building.
-const DIST_DIR = path.join(__dirname, 'extension-build');
+const DIST_DIR = path.join(__dirname, 'release');
 const OUTPUT_FILE = path.join(DIST_DIR, 'content.js');
 
 // Files in dependency order (later files can reference earlier ones)
@@ -56,7 +56,7 @@ const JS_FILES = [
     'init/bootstrap.js',
 ];
 
-// Ensure extension-build directory exists
+// Ensure release directory exists
 if (!fs.existsSync(DIST_DIR)) {
     fs.mkdirSync(DIST_DIR, { recursive: true });
 }
@@ -82,7 +82,7 @@ for (const file of JS_FILES) {
 // --- (Previous logic for JS continues) ---
 
 fs.writeFileSync(OUTPUT_FILE, output, 'utf-8');
-console.log(`✅ Build complete: extension-build/content.js (${(fs.statSync(OUTPUT_FILE).size / 1024).toFixed(1)} KB)`);
+console.log(`✅ Build complete: release/content.js (${(fs.statSync(OUTPUT_FILE).size / 1024).toFixed(1)} KB)`);
 
 // ─── CSS Bundle ───
 const CSS_OUTPUT = path.join(DIST_DIR, 'content.css');
@@ -115,7 +115,7 @@ for (const file of CSS_FILES) {
 }
 
 fs.writeFileSync(CSS_OUTPUT, cssOutput, 'utf-8');
-console.log(`✅ Build complete: extension-build/content.css (${(fs.statSync(CSS_OUTPUT).size / 1024).toFixed(1)} KB)`);
+console.log(`✅ Build complete: release/content.css (${(fs.statSync(CSS_OUTPUT).size / 1024).toFixed(1)} KB)`);
 
 // ─── Background Bundle ───
 const BACKGROUND_OUTPUT = path.join(DIST_DIR, 'background.js');
@@ -140,16 +140,16 @@ for (const file of BACKGROUND_FILES) {
 }
 
 fs.writeFileSync(BACKGROUND_OUTPUT, bgOutput, 'utf-8');
-console.log(`✅ Build complete: extension-build/background.js (${(fs.statSync(BACKGROUND_OUTPUT).size / 1024).toFixed(1)} KB)`);
+console.log(`✅ Build complete: release/background.js (${(fs.statSync(BACKGROUND_OUTPUT).size / 1024).toFixed(1)} KB)`);
 
 // ─── Manifest and icons ───
-// The manifest's paths are relative to extension-build/.
+// The manifest's paths are relative to release/.
 fs.copyFileSync(path.join(SRC_DIR, 'manifest.json'), path.join(DIST_DIR, 'manifest.json'));
 fs.mkdirSync(path.join(DIST_DIR, 'icons'), { recursive: true });
 for (const icon of ['icon16.png', 'icon48.png', 'icon128.png']) {
     fs.copyFileSync(path.join(__dirname, 'icons', icon), path.join(DIST_DIR, 'icons', icon));
 }
-console.log('✅ Copied: extension-build/manifest.json and icons/');
+console.log('✅ Copied: release/manifest.json and icons/');
 
 // Print summary details
 console.log(`\n📊 Source file line counts:`);

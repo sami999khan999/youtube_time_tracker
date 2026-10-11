@@ -1,6 +1,6 @@
 /* ─── Page Dimmer ───────────────────────────────────────────────────────────
  *
- * Ships inside extension-build/content.css, which the manifest declares as a
+ * Ships inside release/content.css, which the manifest declares as a
  * document_start content-script stylesheet. The browser therefore has these
  * rules loaded BEFORE the page's first paint, with no JavaScript involved —
  * turning the dim on is just a matter of setting two properties on <html>
